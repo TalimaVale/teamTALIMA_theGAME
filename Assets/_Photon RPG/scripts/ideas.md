@@ -1,4 +1,4 @@
-﻿# teamTALIMA: theGAME
+# teamTALIMA: theGAME
 Checklist to final build
 
 
@@ -13,13 +13,14 @@ Functionality:
 
 
 ## LEVEL 1
-Functionality:
+Functionality:  
 - Move character
 - Respawn after falling off platform
 - Press Exit button
     - Load MAIN MENU scene
+  
 
+Level 1 = a photon room  
+- our only room (to start) for our game  
 
-- Level 1 = a photon room
-    - our only room (to start) for our game
-- Photon Server needs to be run on Windows
+Photon Server needs to be run on Windows

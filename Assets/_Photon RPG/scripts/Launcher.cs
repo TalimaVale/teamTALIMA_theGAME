@@ -13,7 +13,7 @@ public class Launcher : PunBehaviour, ISubmitHandler {
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
 
     MyNetworkManager networkManager;
-    string _gameVersion = "1";
+    string _gameVersion = "0.0.2";
     bool isConnecting;
 
     void Awake() {
@@ -64,7 +64,7 @@ public class Launcher : PunBehaviour, ISubmitHandler {
         if (PhotonNetwork.connected) {
             // join/create room 'Level 1'
             PhotonNetwork.JoinOrCreateRoom("Level 1", new RoomOptions { MaxPlayers = 14 }, null);
-            Debug.Log("<Color=Blue>Connect()</Color -- called JoinRoom('Level 1')");
+            Debug.Log("<Color=Blue>Connect()</Color> -- called JoinRoom('Level 1')");
         } else {
             // connect to Photon Online Server
             PhotonNetwork.ConnectUsingSettings(_gameVersion);

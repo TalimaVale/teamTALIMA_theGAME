@@ -751,38 +751,34 @@ using ExitGames.Client.Photon;
             }
 
             return this.OpCustom((byte) OperationCode.RaiseEvent, opParameters, sendReliable, raiseEventOptions.SequenceChannel, raiseEventOptions.Encrypt);
-        }
-
-
-        /// <summary>
-        /// Internally used operation to set some "per server" settings. This is for the Master Server.
-        /// </summary>
-        /// <param name="receiveLobbyStats">Set to true, to get Lobby Statistics (lists of existing lobbies).</param>
-        /// <returns>False if the operation could not be sent.</returns>
-        public virtual bool OpSettings(bool receiveLobbyStats)
-        {
-            if (this.DebugOut >= DebugLevel.ALL)
-            {
-                this.Listener.DebugReturn(DebugLevel.ALL, "OpSettings()");
-            }
-
-            // re-used private variable to avoid many new Dictionary() calls (garbage collection)
-            opParameters.Clear();
-
-            // implementation for Master Server:
-            if (receiveLobbyStats)
-            {
-                opParameters[(byte)0] = receiveLobbyStats;
-            }
-
-            if (this.opParameters.Count == 0)
-            {
-                // no need to send op in case we set the default values
-                return true;
-            }
-            return this.OpCustom((byte)OperationCode.ServerSettings, opParameters, true);
-        }
     }
+
+
+    /// <summary>
+    /// Internally used operation to set some "per server" settings. This is for the Master Server.
+    /// </summary>
+    /// <param name="receiveLobbyStats">Set to true, to get Lobby Statistics (lists of existing lobbies).</param>
+    /// <returns>False if the operation could not be sent.</returns>
+    public virtual bool OpSettings(bool receiveLobbyStats) {
+        if (this.DebugOut >= DebugLevel.ALL) {
+            this.Listener.DebugReturn(DebugLevel.ALL, "OpSettings()");
+        }
+
+        // re-used private variable to avoid many new Dictionary() calls (garbage collection)
+        opParameters.Clear();
+
+        // implementation for Master Server:
+        if (receiveLobbyStats) {
+            opParameters[(byte)0] = receiveLobbyStats;
+        }
+
+        if (this.opParameters.Count == 0) {
+            // no need to send op in case we set the default values
+            return true;
+        }
+        return this.OpCustom((byte)OperationCode.ServerSettings, opParameters, true);
+    }
+}
 
     internal class OpJoinRandomRoomParams
     {

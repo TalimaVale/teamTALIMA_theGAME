@@ -1,22 +1,36 @@
-﻿using UnityEngine;
+﻿/*
+ * NetworkManager script
+ * ---
+ * Connects to master server, Connects to game server (room),
+ * Manages player connection,
+ * Disconnects from game server (leaves room), Disconnects from master server
+ * 
+ */
+
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Photon;
 
-public class Launcher : PunBehaviour, ISubmitHandler {
+public class NetworkManager : Photon.PunBehaviour {
 
-    [Tooltip("UI InputField for player username")]
-    InputField field;
+    static public NetworkManager instance = null;
+    GameManager gameManager;
+    
     [Tooltip("UI Text informing player the connection is in progress")]
-    public GameObject progressLabel;
-
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
 
-    MyNetworkManager networkManager;
-    string _gameVersion = "0.0.2";
-    bool isConnecting;
-
+    string _gameVersion = "0.0.2";  // client version
+    bool isConnecting;              // are we currently connecting
+    
     void Awake() {
+        // Check if instance already exists, if not set instance to 'this', if instance is not 'this' destory 'this'
+        if (instance == null) instance = this;
+        else if (instance != this) Destroy(gameObject);
+
+        // Sets this gameObject to not be destroyed when reloading scene
+        DontDestroyOnLoad(gameObject);
+
         // #Critical, auto-set in PhotonServerSettings. We don't join a lobby
         PhotonNetwork.autoJoinLobby = false;
 
@@ -27,37 +41,11 @@ public class Launcher : PunBehaviour, ISubmitHandler {
         PhotonNetwork.logLevel = Loglevel;
     }
 
-    void Start() {
-        networkManager = FindObjectOfType<MyNetworkManager>();
-        field = GameObject.FindGameObjectWithTag("Username Input").GetComponent<InputField>();
-        progressLabel.SetActive(false);
-    }
-
-    void Update() {
-        // fire Submit event when InputField is not focused
-        if (!field.isFocused && field.text != "" && Input.GetButtonDown("Submit")) {
-            PassUsername();
-        }
-    }
-
-    // fire Submit event when InputField is focused
-    void ISubmitHandler.OnSubmit(BaseEventData eventData) {
-        PassUsername();
-    }
-
-    // Pass inputed username to NetworkManager to instantiate new player - Button.onClick()
-    public void PassUsername() {
-        networkManager.ReceiveUsername(field.text + " ");
-        Connect();
-        Debug.Log("<Color=Blue>PassUsername()</Color> -- We call Connect()");
-    }
-
     ///<summary>
-    /// Start the connection process. If connected load 'Level 1', else connect to Photon Cloud Network.
+    /// Start the connection process. If connected load 'Level 1', else connect to Photon Server.
     /// </summary>
     public void Connect() {
         isConnecting = true;
-        progressLabel.SetActive(true);
         Debug.Log("<Color=Blue>Connect()</Color> -- isConnecting was just set to: " + isConnecting);
 
         // are we connected
@@ -74,16 +62,16 @@ public class Launcher : PunBehaviour, ISubmitHandler {
     public override void OnConnectedToMaster() {
         Debug.Log("<Color=Blue>OnConnectedToMaster()</Color>");
 
+        Debug.Log("<Color=Blue>OnConnectedToMaster()</Color> -- isConnecting = " + isConnecting);
         // isConnecting is false typically when you lost or quit the game
         if (isConnecting) {
             // join/create room 'Level 1'
             PhotonNetwork.JoinOrCreateRoom("Level 1", new RoomOptions { MaxPlayers = 14 }, null);
-            Debug.Log("<Color=Blue>OnConnectedToMaster()</Color> -- called JoinRoom('Level 1')");
+            Debug.Log("<Color=Blue>OnConnectedToMaster()</Color> -- called JoinOrCreateRoom('Level 1')");
         }
     }
 
     public override void OnPhotonJoinRoomFailed(object[] codeAndMsg) {
-        // PhotonNetwork.CreateRoom("Level 1", new RoomOptions() { MaxPlayers = 14 }, null);
         Debug.Log("<Color=Blue>OnPhotonJoinRoomFailed()</Color> -- we failed to join room 'Level 1'");
     }
 
@@ -97,10 +85,31 @@ public class Launcher : PunBehaviour, ISubmitHandler {
         } else {
             Debug.Log("<Color=Blue>OnJoinedRoom()</Color> -- no Level loaded because there is more than 1 player here");
         }
+
+        Debug.Log("<Color=Blue>OnJoinedRoom()</Color> -- Master Server Address: " + PhotonNetwork.networkingPeer.MasterServerAddress);
+        Debug.Log("<Color=Blue>OnJoinedRoom()</Color> -- Game Server Address: " + PhotonNetwork.networkingPeer.GameServerAddress);
+    }
+
+    public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer) {
+        Debug.Log("<Color=Blue>OnPhotonPlayerConnected()</Color> -- New player connected: " + newPlayer.NickName);
+    }
+
+    ///<summary>
+    /// Leave game server.
+    /// </summary>
+    public void LeaveRoom() {
+        Debug.Log("<Color=Blue>LeaveRoom()</Color> -- Leaving game server");
+        PhotonNetwork.LeaveRoom();
+    }
+    
+    public override void OnLeftRoom() {
+        isConnecting = false;
+        Debug.Log("<Color=Blue>LeaveRoom()</Color> -- isConnecting was just set to: " + isConnecting);
+        Debug.Log("<Color=Blue>OnLeftRoom()</Color> -- Loading Main Menu");
+        PhotonNetwork.LoadLevel("Main Menu");
     }
 
     public override void OnDisconnectedFromPhoton() {
         Debug.LogWarning("<Color=Red>OnDisconnectedFromPhoton()</Color>");
-        progressLabel.SetActive(false);
     }
 }

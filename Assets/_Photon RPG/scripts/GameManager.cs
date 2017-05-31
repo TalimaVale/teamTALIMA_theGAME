@@ -33,15 +33,9 @@ public class GameManager : PunBehaviour {
             PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0);
         }
     }
-
-    public void LeaveRoom() {
-        PhotonNetwork.LeaveRoom();
-    }
-
-    /// <summary>
-    /// Called when the local player left the room. We need to load the launcher scene.
-    /// </summary>
-    public override void OnLeftRoom() {
-        SceneManager.LoadScene("Main Menu");
-    }
 }
+
+
+
+// #username#exppoints#money
+// #username2#exppoints#money

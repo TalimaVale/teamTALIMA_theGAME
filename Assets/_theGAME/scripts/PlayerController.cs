@@ -8,6 +8,10 @@ public class PlayerController : PunBehaviour {
     
     GameManager gameManager;
 
+    Camera mainCamera;
+    CameraController cameraController;
+    public float fadeRate = 0.02f;
+
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject localPlayer;
     
@@ -23,6 +27,8 @@ public class PlayerController : PunBehaviour {
 
     void Awake() {
         gameManager = FindObjectOfType<GameManager>();
+        mainCamera = Camera.main;
+        cameraController = mainCamera.GetComponent<CameraController>();
         
         // keep track of the localPlayer to prevent instantiation when levels are synchronized
         if (photonView.isMine) {
@@ -53,27 +59,39 @@ public class PlayerController : PunBehaviour {
 
         if (Input.GetMouseButton(0) && Input.GetMouseButton(1)) {
             if (z == 0) z = 1 * Time.deltaTime * 3.0f;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
         } else if (!Input.GetMouseButton(0) && (x != 0f || z != 0f)) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
         }
         
         transform.Translate(x, 0, z);
     }
 
     void LateUpdate() {
-        playerCanvas.rotation = Camera.main.transform.rotation;
-    }
-
-    // in an "observed" script:
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
-        /*
-        if (stream.isWriting) {
-            stream.SendNext(transform.position);
-        } else {
-            this.transform.position = (Vector3)stream.ReceiveNext();
+        playerCanvas.rotation = mainCamera.transform.rotation;
+        
+        // Handle player fade when camera moves between 1st and 3rd person views
+        // if camera is within 1st-person view distance
+        if (cameraController.curDistance < 2) {
+            // if zooming to 1st person
+            if (cameraController.distance <= cameraController.curDistance) {
+                cameraController.distance = Mathf.Clamp(cameraController.distance - fadeRate * 3, 0, cameraController.distanceMax);
+                playerFade(-1.0f);
+            // else if zooming from 1st person
+            } else {
+                cameraController.distance += fadeRate;
+                if (cameraController.curDistance > 1f) {
+                    playerFade(fadeRate);
+                }
+            }
+        // if camera is within 3rd-person view distance
+        } else if (cameraController.curDistance > 2.5f) {
+            playerFade(1);
+        // if camera is "between" optimal view distances, correct alpha if necesary
+        } else if (this.GetComponent<MeshRenderer>().material.color.a != 1) {
+            cameraController.distance += fadeRate;
+            playerFade(fadeRate);
         }
-        */
     }
 
     private void OnTriggerEnter(Collider other) {
@@ -96,5 +114,16 @@ public class PlayerController : PunBehaviour {
 
         Debug.Log("Spawn Point chosen: " + spawnPoint);
         transform.position = spawnPoint;
+    }
+
+    public void playerFade(float alphaValue) {
+        if (localPlayer) {
+            MeshRenderer[] renderers = localPlayer.GetComponentsInChildren<MeshRenderer>();
+            for (int i = 0; i < renderers.Length; i++) {
+                Color color = renderers[i].material.color;
+                color.a = Mathf.Clamp(color.a + alphaValue, 0, 1);
+                renderers[i].material.color = color;
+            }
+        }
     }
 }

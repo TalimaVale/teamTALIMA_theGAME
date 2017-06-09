@@ -10,6 +10,8 @@ public class PlayerController : PunBehaviour {
 
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject localPlayer;
+    
+    public float rotationSlerpSpeed = 224f;
 
     public Transform playerCanvas;
     public Vector3 ScreenOffset = new Vector3(0f, 30f, 0f);
@@ -25,6 +27,7 @@ public class PlayerController : PunBehaviour {
         // keep track of the localPlayer to prevent instantiation when levels are synchronized
         if (photonView.isMine) {
             localPlayer = this.gameObject;
+            Camera.main.GetComponent<CameraController>().target = transform;
         }
     }
 
@@ -44,12 +47,18 @@ public class PlayerController : PunBehaviour {
 
     void Update() {
         if (!photonView.isMine) return;
-
-        var y = Input.GetAxis("Horizontal") * Time.deltaTime * 150.0f;
+        
+        var x = Input.GetAxis("Horizontal") * Time.deltaTime * 3.0f;
         var z = Input.GetAxis("Vertical") * Time.deltaTime * 3.0f;
 
-        transform.Rotate(0, y, 0);
-        transform.Translate(0, 0, -z);
+        if (Input.GetMouseButton(0) && Input.GetMouseButton(1)) {
+            if (z == 0) z = 1 * Time.deltaTime * 3.0f;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+        } else if (!Input.GetMouseButton(0) && (x != 0f || z != 0f)) {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+        }
+        
+        transform.Translate(x, 0, z);
     }
 
     void LateUpdate() {

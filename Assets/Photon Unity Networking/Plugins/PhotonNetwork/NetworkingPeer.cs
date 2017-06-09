@@ -447,7 +447,6 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
     /// <summary>Caches PhotonNetworkingMessage.OnPhotonInstantiate.ToString(), because DoInstantiate calls it often (and ToString() on the enum is astonishingly expensive).</summary>
     private static readonly string OnPhotonInstantiateString = PhotonNetworkingMessage.OnPhotonInstantiate.ToString();
 
-
     // TODO: CAS must be implemented for OfflineMode
 
     public NetworkingPeer(string playername, ConnectionProtocol connectionProtocol) : base(connectionProtocol)
@@ -1937,6 +1936,15 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                 SendMonoMessage(PhotonNetworkingMessage.OnWebRpcResponse, operationResponse);
                 break;
 
+            #region Custom Operation Responses
+
+            // "HelloWorld" operation code = 190
+            case OperationCode.HelloWorld:
+                CustomOperations.OpHelloWorldResponse(operationResponse);
+                break;
+
+            #endregion
+
             default:
                 Debug.LogWarning(string.Format("OperationResponse unhandled: {0}", operationResponse.ToString()));
                 break;
@@ -2047,6 +2055,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                 break;
 
             case StatusCode.Disconnect:
+
                 this.didAuthenticate = false;
                 this.isFetchingFriendList = false;
                 if (this.Server == ServerConnection.GameServer) this.LeftRoomCleanup();

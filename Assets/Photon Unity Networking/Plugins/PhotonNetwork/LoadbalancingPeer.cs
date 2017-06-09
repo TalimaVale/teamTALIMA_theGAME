@@ -1367,7 +1367,10 @@ using ExitGames.Client.Photon;
 
         /// <summary>(217) Get the game list matching a supplied sql filter (SqlListLobby only) </summary>
         public const byte GetGameList = 217;
-    }
+
+        /// <summary>(190) Send 'Hello World' message </summary>
+        public const byte HelloWorld = 190;
+}
 
     /// <summary>Defines possible values for OpJoinRoom and OpJoinOrCreate. It tells the server if the room can be only be joined normally, created implicitly or found on a web-service for Turnbased games.</summary>
     /// <remarks>These values are not directly used by a game but implicitly set.</remarks>

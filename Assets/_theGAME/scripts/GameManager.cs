@@ -8,6 +8,8 @@ public class GameManager : PunBehaviour {
 
     static public GameManager instance = null;
 
+    CustomOperations customOps;
+
     [Tooltip("The prefab to use for representing the player")]
     public GameObject playerPrefab;
 
@@ -19,8 +21,7 @@ public class GameManager : PunBehaviour {
         if (instance == null) instance = this;
         else if (instance != this) Destroy(gameObject);
 
-        // Sets this gameObject to not be destroyed when reloading scene
-        //DontDestroyOnLoad(gameObject);
+        customOps = FindObjectOfType<NetworkManager>().GetComponent<CustomOperations>();
 
         spawnPoints = FindObjectsOfType<SpawnPoint>();
     }
@@ -31,6 +32,12 @@ public class GameManager : PunBehaviour {
         } else if (PlayerController.localPlayer == null) {
             Debug.Log("We are Instantiating LocalPlayer from " + SceneManager.GetActiveScene().name);
             PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0);
+        }
+    }
+
+    void Update() {
+        if(Input.GetButtonUp("Hello World")) {
+            customOps.OpHelloWorld();
         }
     }
 }

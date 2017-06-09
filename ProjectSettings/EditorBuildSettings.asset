@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Photon RPG/Main Menu.unity
-    guid: 00000000000000000000000000000000
+    path: Assets/_theGAME/Main Menu.unity
+    guid: 9a98c1881a6c7674798a321de1c845c9
   - enabled: 1
-    path: Assets/_Photon RPG/Level 1.unity
-    guid: 00000000000000000000000000000000
+    path: Assets/_theGAME/Level 1.unity
+    guid: bceb8de176c9f5e4a8b171732d3b3a15

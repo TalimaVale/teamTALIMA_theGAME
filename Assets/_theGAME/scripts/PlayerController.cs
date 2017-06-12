@@ -14,6 +14,7 @@ public class PlayerController : PunBehaviour {
 
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject localPlayer;
+    public bool isLocalPlayer { get { return photonView.isMine; } }
     
     public float rotationSlerpSpeed = 224f;
 
@@ -31,9 +32,9 @@ public class PlayerController : PunBehaviour {
         cameraController = mainCamera.GetComponent<CameraController>();
         
         // keep track of the localPlayer to prevent instantiation when levels are synchronized
-        if (photonView.isMine) {
+        if (isLocalPlayer) {
             localPlayer = this.gameObject;
-            Camera.main.GetComponent<CameraController>().target = transform;
+            cameraController.target = transform;
         }
     }
 
@@ -43,7 +44,7 @@ public class PlayerController : PunBehaviour {
         playerCanvas = transform.Find("Player Canvas");
         txtPlayerUsername.text = photonView.owner.NickName;
 
-        if (photonView.isMine) {
+        if (isLocalPlayer) {
             GetComponent<MeshRenderer>().material.color = new Color(8/255f, 168/255f, 241/255f, 1);
             //GetComponent<MeshRenderer>().material.color = new Color(0x08/ 255f, 0xA8/255f, 0xF1/255f, 1);
             //GetComponent<MeshRenderer>().material.color = new Color32(8, 168, 241, 255);
@@ -52,7 +53,7 @@ public class PlayerController : PunBehaviour {
     }
 
     void Update() {
-        if (!photonView.isMine) return;
+        if (!isLocalPlayer) return;
         
         var x = Input.GetAxis("Horizontal") * Time.deltaTime * 3.0f;
         var z = Input.GetAxis("Vertical") * Time.deltaTime * 3.0f;
@@ -95,12 +96,12 @@ public class PlayerController : PunBehaviour {
     }
 
     private void OnTriggerEnter(Collider other) {
-        if (!localPlayer) return;
+        if (!isLocalPlayer) return;
         if (other.CompareTag("Respawn Shield")) Respawn();
     }
     
     public void Respawn() {
-        if (!localPlayer) return;
+        if (!isLocalPlayer) return;
 
         Debug.Log("Choosing a spawn point.");
         // Default spawn point
@@ -117,13 +118,13 @@ public class PlayerController : PunBehaviour {
     }
 
     public void playerFade(float alphaValue) {
-        if (localPlayer) {
-            MeshRenderer[] renderers = localPlayer.GetComponentsInChildren<MeshRenderer>();
-            for (int i = 0; i < renderers.Length; i++) {
-                Color color = renderers[i].material.color;
-                color.a = Mathf.Clamp(color.a + alphaValue, 0, 1);
-                renderers[i].material.color = color;
-            }
+        if (!isLocalPlayer) return;
+
+        MeshRenderer[] renderers = localPlayer.GetComponentsInChildren<MeshRenderer>();
+        for (int i = 0; i < renderers.Length; i++) {
+            Color color = renderers[i].material.color;
+            color.a = Mathf.Clamp(color.a + alphaValue, 0, 1);
+            renderers[i].material.color = color;
         }
     }
 }

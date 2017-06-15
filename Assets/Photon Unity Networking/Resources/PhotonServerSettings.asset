@@ -43,4 +43,9 @@ MonoBehaviour:
   - RequestForPickupItems
   - RequestForPickupTimes
   - TaggedPlayer
+  - InstantiateBlock
+  - SetParent
+  - PickUpBlock
+  - DropBlock
+  - SetBlockParent
   DisableAutoOpenWizard: 1

@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Username Input
+  - Respawn Shield
   layers:
   - Default
   - TransparentFX
@@ -15,7 +16,7 @@ TagManager:
   - 
   - 
   - Player
-  - 
+  - Interact
   - 
   - 
   - 

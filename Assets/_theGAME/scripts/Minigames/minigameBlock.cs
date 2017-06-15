@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Photon;
 
 public class minigameBlock : PunBehaviour {
 
-    private Transform console;
     private Rigidbody rb;
 
     public PlayerController owner;
@@ -11,7 +10,6 @@ public class minigameBlock : PunBehaviour {
 
     // Use this for initialization
     void Start () {
-        console = transform.parent;
         rb = GetComponent<Rigidbody>();
 	}
 
@@ -20,6 +18,18 @@ public class minigameBlock : PunBehaviour {
             stream.SendNext(hasOwner);
         } else {
             hasOwner = (bool)stream.ReceiveNext();
+        }
+    }
+
+    void Update() {
+        if (owner != null) {
+            rb.isKinematic = true;
+            transform.rotation = owner.transform.rotation;
+            transform.position = owner.transform.position + (owner.transform.rotation * new Vector3(0f, .5f, 1.1f));
+        } else {
+            rb.isKinematic = false;
+            //transform.rotation = owner.transform.rotation;
+            //owner.transform.TransformDirection(new Vector3(0f, .5f, 1.1f));
         }
     }
 
@@ -35,7 +45,6 @@ public class minigameBlock : PunBehaviour {
             Debug.Log("Block is being picked up by player");
             photonView.RPC("PickUpBlock", PhotonTargets.All, player.photonView.viewID);
         } else if(hasOwner == true && player == owner) {
-            
             Debug.Log("Block is being DROPPED by player: " + player.name);
             photonView.RPC("DropBlock", PhotonTargets.All);
         } else {
@@ -49,12 +58,14 @@ public class minigameBlock : PunBehaviour {
         owner = PhotonView.Find(playerViewID).GetComponent<PlayerController>();
         owner.heldItem = gameObject;
         
-        rb.useGravity = false;
+        //rb.useGravity = false;
         rb.isKinematic = true;
-        Transform t = owner.gameObject.transform;
-        transform.SetParent(t);
-        transform.localRotation = Quaternion.identity;
-        transform.localPosition = new Vector3(0.0f, 0.5f, 1.1f);
+        //Transform t = owner.gameObject.transform;
+        //transform.SetParent(t);
+        //if (photonView.isMine && owner == PlayerController.localPlayer) {
+        //    transform.localRotation = Quaternion.identity;
+        //    transform.localPosition = new Vector3(0.0f, 0.5f, 1.1f);
+        //}
     }
 
     [PunRPC]
@@ -63,8 +74,10 @@ public class minigameBlock : PunBehaviour {
         owner.heldItem = null;
         owner = null;
 
-        rb.useGravity = true;
+        //rb.useGravity = true;
         rb.isKinematic = false;
-        transform.SetParent(console.transform);
+        //var p = transform.position;
+        //transform.SetParent(console.transform);
+        //transform.localPosition = console.transform.InverseTransformPoint(p);
     }
 }

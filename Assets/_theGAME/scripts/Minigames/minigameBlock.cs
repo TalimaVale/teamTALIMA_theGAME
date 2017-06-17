@@ -1,7 +1,7 @@
 using UnityEngine;
 using Photon;
 
-public class minigameBlock : PunBehaviour {
+public class minigameBlock : PunBehaviour, IPunObservable {
 
     private Rigidbody rb;
     public minigameBlockStack console;
@@ -9,27 +9,52 @@ public class minigameBlock : PunBehaviour {
     public PlayerController owner;
     public bool hasOwner = false;
 
-    // Use this for initialization
-    void Start () {
+	private Vector3 HoldLocalVector = new Vector3(0f, .5f, 1.1f);
+
+	// Use this for initialization
+	void Start () {
         rb = GetComponent<Rigidbody>();
         console = transform.parent.GetComponent<minigameBlockStack>();
 	}
 
-    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
-        if (stream.isWriting) {
-            stream.SendNext(hasOwner);
-        } else {
-            hasOwner = (bool)stream.ReceiveNext();
-        }
-    }
+	void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+	{
+		if(stream.isWriting)
+		{
+			stream.SendNext(hasOwner);
+
+			stream.SendNext(transform.position);
+			stream.SendNext(transform.rotation);
+
+			stream.SendNext(transform.localPosition);
+			stream.SendNext(transform.localRotation);
+		}
+		else
+		{
+			hasOwner = (bool)stream.ReceiveNext();
+
+			transform.position = (Vector3)stream.ReceiveNext();
+			transform.rotation = (Quaternion)stream.ReceiveNext();
+
+			transform.localPosition = (Vector3)stream.ReceiveNext();
+			transform.localRotation = (Quaternion)stream.ReceiveNext();
+		}
+	}
 
     void Update() {
         if (owner != null) {
             rb.isKinematic = true;
-            transform.rotation = owner.transform.rotation;
-            transform.position = owner.transform.position + (owner.transform.rotation * new Vector3(0f, .5f, 1.1f));
+            
+			if(transform.parent != owner.transform)
+			{
+				transform.parent = owner.transform;
+				transform.localPosition = HoldLocalVector;
+				transform.localRotation = Quaternion.identity;
+			}
+
         } else {
             rb.isKinematic = false;
+			transform.parent = null;
         }
         if(console.win && photonView.isMine) {
             // play destory animation/particle effect

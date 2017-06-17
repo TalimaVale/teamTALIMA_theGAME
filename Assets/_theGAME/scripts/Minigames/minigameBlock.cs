@@ -4,6 +4,7 @@ using Photon;
 public class minigameBlock : PunBehaviour {
 
     private Rigidbody rb;
+    public minigameBlockStack console;
 
     public PlayerController owner;
     public bool hasOwner = false;
@@ -11,6 +12,7 @@ public class minigameBlock : PunBehaviour {
     // Use this for initialization
     void Start () {
         rb = GetComponent<Rigidbody>();
+        console = transform.parent.GetComponent<minigameBlockStack>();
 	}
 
     void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
@@ -28,9 +30,15 @@ public class minigameBlock : PunBehaviour {
             transform.position = owner.transform.position + (owner.transform.rotation * new Vector3(0f, .5f, 1.1f));
         } else {
             rb.isKinematic = false;
-            //transform.rotation = owner.transform.rotation;
-            //owner.transform.TransformDirection(new Vector3(0f, .5f, 1.1f));
         }
+        if(console.win && photonView.isMine) {
+            // play destory animation/particle effect
+            Debug.Log("Destroying block: " + console.win + ", " + photonView.isMine);
+            PhotonNetwork.Destroy(photonView);
+        }
+
+        // if block falls, teleport it back
+        if (owner == null && transform.position.y <= -5) transform.localPosition = new Vector3(Random.Range(-5, 5), console.blockSpawnHeight, Random.Range(-5, 5));
     }
 
     public void Interact(PlayerController player) {
@@ -58,14 +66,7 @@ public class minigameBlock : PunBehaviour {
         owner = PhotonView.Find(playerViewID).GetComponent<PlayerController>();
         owner.heldItem = gameObject;
         
-        //rb.useGravity = false;
         rb.isKinematic = true;
-        //Transform t = owner.gameObject.transform;
-        //transform.SetParent(t);
-        //if (photonView.isMine && owner == PlayerController.localPlayer) {
-        //    transform.localRotation = Quaternion.identity;
-        //    transform.localPosition = new Vector3(0.0f, 0.5f, 1.1f);
-        //}
     }
 
     [PunRPC]
@@ -73,11 +74,7 @@ public class minigameBlock : PunBehaviour {
         hasOwner = false;
         owner.heldItem = null;
         owner = null;
-
-        //rb.useGravity = true;
+        
         rb.isKinematic = false;
-        //var p = transform.position;
-        //transform.SetParent(console.transform);
-        //transform.localPosition = console.transform.InverseTransformPoint(p);
     }
 }

@@ -48,4 +48,6 @@ MonoBehaviour:
   - PickUpBlock
   - DropBlock
   - SetBlockParent
+  - MinigameWin
+  - MinigameSetup
   DisableAutoOpenWizard: 1

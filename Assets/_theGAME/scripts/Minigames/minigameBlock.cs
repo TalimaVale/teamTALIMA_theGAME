@@ -3,26 +3,29 @@ using Photon;
 
 public class minigameBlock : PunBehaviour, IPunObservable {
 
-    private Rigidbody rb;
-    public minigameBlockStack console;
+	private Rigidbody rb;
+	public PlayerController owner;
 
-    public PlayerController owner;
-    public bool hasOwner = false;
+	public bool HasOwner
+	{
+		get
+		{
+			return (owner != null);
+		}
+	}
 
 	private Vector3 HoldLocalVector = new Vector3(0f, .5f, 1.1f);
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+	{
         rb = GetComponent<Rigidbody>();
-        console = transform.parent.GetComponent<minigameBlockStack>();
 	}
 
 	void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 	{
 		if(stream.isWriting)
 		{
-			stream.SendNext(hasOwner);
-
 			stream.SendNext(transform.position);
 			stream.SendNext(transform.rotation);
 
@@ -31,8 +34,6 @@ public class minigameBlock : PunBehaviour, IPunObservable {
 		}
 		else
 		{
-			hasOwner = (bool)stream.ReceiveNext();
-
 			transform.position = (Vector3)stream.ReceiveNext();
 			transform.rotation = (Quaternion)stream.ReceiveNext();
 
@@ -41,53 +42,55 @@ public class minigameBlock : PunBehaviour, IPunObservable {
 		}
 	}
 
-    void Update() {
-        if (owner != null) {
+    void Update()
+	{
+        if (HasOwner)
+		{
             rb.isKinematic = true;
             
 			if(transform.parent != owner.transform)
 			{
-				transform.parent = owner.transform;
-				transform.localPosition = HoldLocalVector;
-				transform.localRotation = Quaternion.identity;
+				photonView.RPC("UpdateParent", PhotonTargets.AllBuffered);
 			}
-
-        } else {
+        }
+		else
+		{
             rb.isKinematic = false;
 			transform.parent = null;
         }
-        if(console.win && photonView.isMine) {
-            // play destory animation/particle effect
-            Debug.Log("Destroying block: " + console.win + ", " + photonView.isMine);
-            PhotonNetwork.Destroy(photonView);
-        }
-
-        // if block falls, teleport it back
-        if (owner == null && transform.position.y <= -5) transform.localPosition = new Vector3(Random.Range(-5, 5), console.blockSpawnHeight, Random.Range(-5, 5));
     }
 
-    public void Interact(PlayerController player) {
-        if(hasOwner == false) {
+	[PunRPC]
+	public void UpdateParent()
+	{
+		transform.parent = owner.transform;
+		transform.localPosition = HoldLocalVector;
+		transform.localRotation = Quaternion.identity;
+	}
+
+	public void Interact(PlayerController player)
+	{
+        if(!HasOwner)
+		{
             if (player.heldItem != null) return;
 
-            if (PhotonNetwork.player != photonView.owner) {
-                Debug.Log("Request viewOwnership of Block");
-                photonView.RequestOwnership();
-            }
-
-            Debug.Log("Block is being picked up by player");
+            Debug.Log("Block is being picked up by player: " + player.photonView.owner.NickName);
             photonView.RPC("PickUpBlock", PhotonTargets.All, player.photonView.viewID);
-        } else if(hasOwner == true && player == owner) {
-            Debug.Log("Block is being DROPPED by player: " + player.name);
+        }
+		else if(HasOwner && player == owner)
+		{
+            Debug.Log("Block is being DROPPED by player: " + player.photonView.owner.NickName);
             photonView.RPC("DropBlock", PhotonTargets.All);
-        } else {
+        }
+		else
+		{
             Debug.Log("Attempt made to steal block");
         }
     }
 
     [PunRPC]
-    void PickUpBlock(int playerViewID) {
-        hasOwner = true;
+    void PickUpBlock(int playerViewID)
+	{
         owner = PhotonView.Find(playerViewID).GetComponent<PlayerController>();
         owner.heldItem = gameObject;
         
@@ -95,8 +98,8 @@ public class minigameBlock : PunBehaviour, IPunObservable {
     }
 
     [PunRPC]
-    void DropBlock() {
-        hasOwner = false;
+    void DropBlock()
+	{
         owner.heldItem = null;
         owner = null;
         

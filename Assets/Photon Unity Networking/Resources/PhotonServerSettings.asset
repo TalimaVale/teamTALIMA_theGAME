@@ -50,4 +50,7 @@ MonoBehaviour:
   - SetBlockParent
   - MinigameWin
   - MinigameSetup
+  - InstantiatePrefabInScene
+  - SetGameRunning
+  - DestroyBlocks
   DisableAutoOpenWizard: 1

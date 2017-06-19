@@ -45,12 +45,6 @@ public class NetworkManager : PunBehaviour {
 
         // #NotImportant, force LogLevel
         PhotonNetwork.logLevel = Loglevel;
-
-        roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 14;
-        roomOptions.CustomRoomProperties = new Hashtable();
-        // Is minigame #1 active?
-        roomOptions.CustomRoomProperties.Add("M1", false);
     }
 
     ///<summary>

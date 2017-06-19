@@ -53,4 +53,5 @@ MonoBehaviour:
   - InstantiatePrefabInScene
   - SetGameRunning
   - DestroyBlocks
+  - UpdateParent
   DisableAutoOpenWizard: 1

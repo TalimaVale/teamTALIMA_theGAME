@@ -6,6 +6,11 @@ public class minigameBlock : PunBehaviour, IPunObservable {
 	private Rigidbody rb;
 	private PlayerController Owner;
 
+	private Vector3 MostRecentNetworkPos;
+	private Quaternion MostRecentNetworkRotation;
+
+	private bool HasReceivedUpdates { get; set; }
+
 	public bool HasOwner
 	{
 		get
@@ -20,6 +25,10 @@ public class minigameBlock : PunBehaviour, IPunObservable {
 	void Start ()
 	{
         rb = GetComponent<Rigidbody>();
+
+		MostRecentNetworkPos = new Vector3();
+		MostRecentNetworkRotation = new Quaternion();
+		HasReceivedUpdates = false;
 	}
 
 	void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -31,22 +40,25 @@ public class minigameBlock : PunBehaviour, IPunObservable {
 		}
 		else
 		{
-			Vector3 NewPos = (Vector3)stream.ReceiveNext();
-			Quaternion NewRotation = (Quaternion)stream.ReceiveNext();
-
-			if(!HasOwner)
-			{
-				transform.position = NewPos;
-				transform.rotation = NewRotation;
-			}
+			HasReceivedUpdates = true;
+			MostRecentNetworkPos = (Vector3)stream.ReceiveNext();
+			MostRecentNetworkRotation = (Quaternion)stream.ReceiveNext();
 		}
 	}
 
     void Update()
 	{ 
-		if(HasOwner && (transform.parent != Owner.transform))
+		if(!HasOwner && HasReceivedUpdates)
 		{
-			Debug.Log("PANIC AHHHHH");
+			if(transform.position != MostRecentNetworkPos)
+			{
+				transform.position = Vector3.Lerp(transform.position, MostRecentNetworkPos, Time.deltaTime * 1f);
+			}
+
+			if(transform.rotation != MostRecentNetworkRotation)
+			{
+				transform.rotation = Quaternion.Lerp(transform.rotation, MostRecentNetworkRotation, Time.deltaTime * 1f);
+			}
 		}
     }
 

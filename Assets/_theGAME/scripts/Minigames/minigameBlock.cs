@@ -4,7 +4,7 @@ using Photon;
 public class minigameBlock : PunBehaviour, IPunObservable {
 
 	private Rigidbody rb;
-	private GameObject Owner;
+	private PlayerController Owner;
 
 	public bool HasOwner
 	{
@@ -58,7 +58,7 @@ public class minigameBlock : PunBehaviour, IPunObservable {
             Debug.Log("Block is being picked up by player: " + InteractingPlayer.GetPhotonView().owner.NickName);
             photonView.RPC("PickUpBlock", PhotonTargets.AllBuffered, playerViewID);
         }
-		else if(HasOwner && Owner.GetPhotonView().viewID == playerViewID)
+		else if(HasOwner && Owner.photonView.viewID == playerViewID)
 		{
             Debug.Log("Block is being DROPPED by player: " + InteractingPlayer.GetPhotonView().owner.NickName);
             photonView.RPC("DropBlock", PhotonTargets.AllBuffered);
@@ -72,7 +72,7 @@ public class minigameBlock : PunBehaviour, IPunObservable {
     [PunRPC]
     void PickUpBlock(int playerViewID)
 	{
-		Owner = PhotonView.Find(playerViewID).gameObject;
+		Owner = PhotonView.Find(playerViewID).GetComponent<PlayerController>();
 
 		transform.SetParent(Owner.transform, false);
 		transform.localPosition = HoldLocalVector;
@@ -83,6 +83,7 @@ public class minigameBlock : PunBehaviour, IPunObservable {
     [PunRPC]
     void DropBlock()
 	{
+		Owner.heldItem = null;
 		Owner = null;
 		
 		transform.SetParent(null, true);

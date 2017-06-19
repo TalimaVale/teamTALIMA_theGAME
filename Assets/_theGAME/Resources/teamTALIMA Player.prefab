@@ -333,12 +333,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeRate: 0.02
-  rotationSlerpSpeed: 124
   playerCanvas: {fileID: 0}
-  ScreenOffset: {x: 0, y: 30, z: 0}
-  _characterControllerHeight: 0
-  _targetPosition: {x: 0, y: 0, z: 0}
   txtPlayerUsername: {fileID: 0}
+  playerSpeed: 3
+  jumpForce: 5
+  rotationSlerpSpeed: 124
+  playerReach: 3
+  heldItem: {fileID: 0}
 --- !u!114 &114698527043586634
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -405,7 +406,7 @@ CapsuleCollider:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1416093075307488}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1a75e0ef5882f22428e29ff41e1361c4, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5

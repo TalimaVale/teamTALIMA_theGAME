@@ -11,9 +11,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using ExitGames.Client.Photon;
 using Photon;
 
-public class NetworkManager : Photon.PunBehaviour {
+public class NetworkManager : PunBehaviour {
 
     static public NetworkManager instance = null;
     GameManager gameManager;
@@ -21,9 +22,13 @@ public class NetworkManager : Photon.PunBehaviour {
     [Tooltip("UI Text informing player the connection is in progress")]
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
 
-    string _gameVersion = "0.0.2";  // client version
+    string _gameVersion = "0.0.3";  // client version
     bool isConnecting;              // are we currently connecting
-    
+
+    private RoomOptions roomOptions;
+
+	private readonly string RoomName = "Level 1";
+
     void Awake() {
         // Check if instance already exists, if not set instance to 'this', if instance is not 'this' destory 'this'
         if (instance == null) instance = this;
@@ -52,7 +57,7 @@ public class NetworkManager : Photon.PunBehaviour {
         // are we connected
         if (PhotonNetwork.connected) {
             // join/create room 'Level 1'
-            PhotonNetwork.JoinOrCreateRoom("Level 1", new RoomOptions { MaxPlayers = 14 }, null);
+            PhotonNetwork.JoinOrCreateRoom(RoomName, roomOptions, null);
             Debug.Log("<Color=Blue>Connect()</Color> -- called JoinRoom('Level 1')");
         } else {
             // connect to Photon Online Server
@@ -67,7 +72,7 @@ public class NetworkManager : Photon.PunBehaviour {
         // isConnecting is false typically when you lost or quit the game
         if (isConnecting) {
             // join/create room 'Level 1'
-            PhotonNetwork.JoinOrCreateRoom("Level 1", new RoomOptions { MaxPlayers = 14 }, null);
+            PhotonNetwork.JoinOrCreateRoom(RoomName, roomOptions, null);
             Debug.Log("<Color=Blue>OnConnectedToMaster()</Color> -- called JoinOrCreateRoom('Level 1')");
         }
     }

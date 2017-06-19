@@ -85,6 +85,7 @@ public class minigameBlock : PunBehaviour, IPunObservable {
     void PickUpBlock(int playerViewID)
 	{
 		Owner = PhotonView.Find(playerViewID).GetComponent<PlayerController>();
+		Owner.heldItem = gameObject;
 
 		transform.SetParent(Owner.transform, false);
 		transform.localPosition = HoldLocalVector;

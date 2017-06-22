@@ -29,29 +29,25 @@ MonoBehaviour:
   RpcList:
   - Chat
   - ColorRpc
+  - DestroyBlocks
   - DestroyRpc
   - DoJump
+  - DropBlock
   - Flash
+  - ForceSync
+  - InstantiateMinigameBlockInScene
   - InstantiateRpc
   - Marco
   - OnAwakeRPC
+  - PickUpBlock
   - PickupItemInit
   - Polo
   - PunPickup
   - PunPickupSimple
   - PunRespawn
+  - RemoveAllBufferedRPCs
   - RequestForPickupItems
   - RequestForPickupTimes
-  - TaggedPlayer
-  - InstantiateBlock
-  - SetParent
-  - PickUpBlock
-  - DropBlock
-  - SetBlockParent
-  - MinigameWin
-  - MinigameSetup
-  - InstantiatePrefabInScene
   - SetGameRunning
-  - DestroyBlocks
-  - UpdateParent
+  - TaggedPlayer
   DisableAutoOpenWizard: 1

@@ -10,7 +10,7 @@ public class minigameBlockStack : PunBehaviour
 	List<GameObject> Blocks = new List<GameObject>();
 
 	// Is minigame being played?
-	public bool GameRunning { get; private set; }
+	public bool GameActive { get; private set; }
 
 	public int blockCount = 5;
 	public float blockSpawnHeight = 2;
@@ -26,7 +26,7 @@ public class minigameBlockStack : PunBehaviour
 	void Start()
 	{
 		resetTimer = resetTimeThreshold;
-		GameRunning = false;
+		GameActive = false;
 	}
 
 	void OnDrawGizmos()
@@ -38,7 +38,7 @@ public class minigameBlockStack : PunBehaviour
 
 	void Update()
 	{
-		if(GameRunning)
+		if(GameActive)
 		{
 			if(Physics.OverlapBox(winBoxPosition, winBoxExtents, Quaternion.identity, 1 << LayerMask.NameToLayer("Interact")).Length >= 3)
 			{
@@ -57,7 +57,7 @@ public class minigameBlockStack : PunBehaviour
 			{
 				if(Block.transform.parent == null && Block.transform.position.y <= -5)
 				{
-					Block.transform.position = new Vector3(Random.Range(-5, 5), blockSpawnHeight, Random.Range(-5, 5));
+					Block.transform.position = new Vector3(transform.position.x + Random.Range(-5, 5), blockSpawnHeight, transform.position.z + Random.Range(-5, 5));
 				}
 			}
 		}
@@ -65,6 +65,84 @@ public class minigameBlockStack : PunBehaviour
 		{
 			resetTimer += Time.deltaTime;
 		}
+	}
+
+	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+	{
+		if(stream.isWriting)
+		{
+			stream.SendNext(winTimer);
+			stream.SendNext(resetTimer);
+		}
+		else
+		{
+			winTimer = (float)stream.ReceiveNext();
+			resetTimer = (float)stream.ReceiveNext();
+		}
+	}
+
+	public void Interact()
+	{
+		if(!GameActive)
+		{
+			if(resetTimer < resetTimeThreshold)
+			{
+				Debug.Log("Cannot reset game quite yet.");
+				return;
+			}
+
+			photonView.RPC("RemoveAllBufferedRPCs", PhotonTargets.MasterClient, photonView.viewID);
+			photonView.RPC("SetGameRunning", PhotonTargets.MasterClient, true);
+
+			Debug.Log("Starting minigame!");
+
+			Vector3 offset = new Vector3(0, blockSpawnHeight, 0);
+			for(int i = 0; i < blockCount; i++)
+			{
+				offset.x = Random.Range(-5, 5);
+				offset.z = Random.Range(-5, 5);
+
+				photonView.RPC("InstantiateMinigameBlockInScene", PhotonTargets.MasterClient, transform.position + offset, Quaternion.identity, 0, null);
+			}
+		}
+		else
+		{
+			Debug.Log("Minigame in progress");
+		}
+	}
+
+	public void MinigameWin()
+	{
+		photonView.RPC("RemoveAllBufferedRPCs", PhotonTargets.MasterClient, photonView.viewID);
+		photonView.RPC("SetGameRunning", PhotonTargets.All, false);
+		photonView.RPC("DestroyBlocks", PhotonTargets.MasterClient);
+		Blocks.Clear();
+
+		winTimer = 0.0f;
+		resetTimer = 0.0f;
+		PhotonNetwork.Instantiate("Coin", transform.position + new Vector3(Random.Range(-5, 5), blockSpawnHeight, Random.Range(-5, 5)), Quaternion.identity, 0);
+
+		Debug.Log("We win!! Awesomeness for everyone here :)");
+	}
+
+	[PunRPC]
+	void InstantiateMinigameBlockInScene(Vector3 Position, Quaternion Rotation, int Group, object[] Data)
+	{
+		GameObject block = PhotonNetwork.InstantiateSceneObject("Minigame Block", Position, Rotation, Group, Data);
+		Blocks.Add(block); // Concerned about when the master client changes. Possibly test if blocks delete themselves when 
+						   // the master client changes...
+	}
+
+	[PunRPC]
+	void RemoveAllBufferedRPCs(int photonViewID)
+	{
+		PhotonNetwork.RemoveRPCs(PhotonView.Find(photonViewID));
+	}
+
+	[PunRPC]
+	void SetGameRunning(bool Running)
+	{
+		GameActive = Running;
 	}
 
 	[PunRPC]
@@ -77,75 +155,5 @@ public class minigameBlockStack : PunBehaviour
 				PhotonNetwork.Destroy(Block);
 			}
 		}
-	}
-
-	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-	{
-		if(stream.isWriting)
-		{
-			//stream.SendNext(gameActive);
-			stream.SendNext(winTimer);
-			stream.SendNext(resetTimer);
-		}
-		else
-		{
-			//gameActive = (bool)stream.ReceiveNext();
-			winTimer = (float)stream.ReceiveNext();
-			resetTimer = (float)stream.ReceiveNext();
-		}
-	}
-
-	public void Interact()
-	{
-		if(!GameRunning)
-		{
-			if(resetTimer < resetTimeThreshold)
-			{
-				Debug.Log("Cannot reset game quite yet.");
-				return;
-			}
-
-			photonView.RPC("SetGameRunning", PhotonTargets.AllBuffered, true);
-			Debug.Log("Starting minigame!");
-
-			Vector3 offset = new Vector3(0, blockSpawnHeight, 0);
-			for(int i = 0; i < blockCount; i++)
-			{
-				offset.x = Random.Range(-5, 5);
-				offset.z = Random.Range(-5, 5);
-
-				photonView.RPC("InstantiatePrefabInScene", PhotonTargets.MasterClient, "Minigame Block", transform.position + offset, Quaternion.identity, 0, null);
-			}
-		}
-		else
-		{
-			Debug.Log("Minigame in progress");
-		}
-	}
-
-	[PunRPC]
-	public void InstantiatePrefabInScene(string PrefabName, Vector3 Position, Quaternion Rotation, int Group, object[] Data)
-	{
-		GameObject block = PhotonNetwork.InstantiateSceneObject(PrefabName, Position, Rotation, Group, Data);
-		Blocks.Add(block);
-	}
-	
-	[PunRPC]
-	public void SetGameRunning(bool Running)
-	{
-		GameRunning = Running;
-	}
-
-	public void MinigameWin()
-	{
-		photonView.RPC("SetGameRunning", PhotonTargets.AllBuffered, false);
-		this.photonView.RPC("DestroyBlocks", PhotonTargets.MasterClient);
-		Blocks.Clear();
-
-		winTimer = 0.0f;
-		resetTimer = 0.0f;
-		PhotonNetwork.Instantiate("Coin", transform.position + new Vector3(Random.Range(-5, 5), blockSpawnHeight, Random.Range(-5, 5)), Quaternion.identity, 0);
-
-		Debug.Log("We win!! Awesomeness for everyone here :)");
 	}
 }

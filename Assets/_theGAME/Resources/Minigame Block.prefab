@@ -122,6 +122,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ffc52866389f46488fbf3d9132afab3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MostRecentNetworkPos: {x: 0, y: 0, z: 0}
+  MostRecentNetworkRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &114641720790206520
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -137,10 +139,10 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 1
+  synchronization: 2
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
-  ownershipTransfer: 0
+  ownershipTransfer: 1
   ObservedComponents:
   - {fileID: 114284003389774864}
   ObservedComponentsFoldoutOpen: 1

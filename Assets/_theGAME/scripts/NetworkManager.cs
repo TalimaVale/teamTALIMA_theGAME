@@ -27,6 +27,8 @@ public class NetworkManager : PunBehaviour {
 
     private RoomOptions roomOptions;
 
+	private readonly string RoomName = "Level 1";
+
     void Awake() {
         // Check if instance already exists, if not set instance to 'this', if instance is not 'this' destory 'this'
         if (instance == null) instance = this;
@@ -43,12 +45,6 @@ public class NetworkManager : PunBehaviour {
 
         // #NotImportant, force LogLevel
         PhotonNetwork.logLevel = Loglevel;
-
-        roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 14;
-        roomOptions.CustomRoomProperties = new Hashtable();
-        // Is minigame #1 active?
-        roomOptions.CustomRoomProperties.Add("M1", false);
     }
 
     ///<summary>
@@ -61,7 +57,7 @@ public class NetworkManager : PunBehaviour {
         // are we connected
         if (PhotonNetwork.connected) {
             // join/create room 'Level 1'
-            PhotonNetwork.JoinOrCreateRoom("Level 1", roomOptions, null);
+            PhotonNetwork.JoinOrCreateRoom(RoomName, roomOptions, null);
             Debug.Log("<Color=Blue>Connect()</Color> -- called JoinRoom('Level 1')");
         } else {
             // connect to Photon Online Server
@@ -76,7 +72,7 @@ public class NetworkManager : PunBehaviour {
         // isConnecting is false typically when you lost or quit the game
         if (isConnecting) {
             // join/create room 'Level 1'
-            PhotonNetwork.JoinOrCreateRoom("Level 1", roomOptions, null);
+            PhotonNetwork.JoinOrCreateRoom(RoomName, roomOptions, null);
             Debug.Log("<Color=Blue>OnConnectedToMaster()</Color> -- called JoinOrCreateRoom('Level 1')");
         }
     }

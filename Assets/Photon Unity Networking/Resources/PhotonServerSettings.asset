@@ -50,4 +50,11 @@ MonoBehaviour:
   - SetBlockParent
   - MinigameWin
   - MinigameSetup
+  - SetGameRunning
+  - DestroyBlocks
+  - InstantiatePrefabInScene
+  - SetGameActive
+  - ForceSync
+  - RemoveAllBufferedRPCs
+  - UpdateTransform
   DisableAutoOpenWizard: 1

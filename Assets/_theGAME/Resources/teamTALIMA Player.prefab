@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 114698527043586634}
   - component: {fileID: 114019161044576486}
   - component: {fileID: 114650690372497238}
+  - component: {fileID: 114658811451984868}
   m_Layer: 8
   m_Name: teamTALIMA Player
   m_TagString: Untagged
@@ -340,6 +341,19 @@ MonoBehaviour:
   rotationSlerpSpeed: 124
   playerReach: 3
   heldItem: {fileID: 0}
+--- !u!114 &114658811451984868
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1416093075307488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizeVelocity: 1
+  m_SynchronizeAngularVelocity: 1
 --- !u!114 &114698527043586634
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -362,6 +376,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 114019161044576486}
   - {fileID: 114650690372497238}
+  - {fileID: 114658811451984868}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1

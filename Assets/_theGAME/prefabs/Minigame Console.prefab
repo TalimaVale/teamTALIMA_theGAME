@@ -132,6 +132,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d130421c028281d4493f2ba127edeb96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  block: {fileID: 1204956140632350, guid: b8fcc52c874b46f4d982a7198945d3f5, type: 2}
+  block: Minigame Block
   blockCount: 5
   blockSpawnHeight: 2
+  winTimeThreshold: 3
+  resetTimeThreshold: 10

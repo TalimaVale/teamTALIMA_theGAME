@@ -71,12 +71,12 @@ public class PlayerController : PunBehaviour {
         if (Input.GetButtonDown("Interact")) {
             if (hasItem != false) {
                 Debug.Log("Interacting with our heldItem");
-                heldItem.SendMessage("Interact", this, SendMessageOptions.RequireReceiver);
+                heldItem.SendMessage("Interact", photonView.viewID, SendMessageOptions.RequireReceiver);
             } else {
                 Collider closest;
                 if (FindClosestInteract(out closest)) {
                     Debug.Log("Attempting to interact with: " + closest.name);
-                    closest.gameObject.SendMessage("Interact", this, SendMessageOptions.RequireReceiver);
+                    closest.gameObject.SendMessage("Interact", photonView.viewID, SendMessageOptions.RequireReceiver);
                 } else {
                     Debug.Log("No Interact object within playerReach");
                 }

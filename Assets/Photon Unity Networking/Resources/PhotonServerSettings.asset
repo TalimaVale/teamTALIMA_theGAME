@@ -57,4 +57,10 @@ MonoBehaviour:
   - ForceSync
   - RemoveAllBufferedRPCs
   - UpdateTransform
+  - InstantiateBlockInScene
+  - RespawnBlock
+  - AddToBlocks
+  - OnPhotonSerializeView
+  - SetPositionData
+  - SetBlockData
   DisableAutoOpenWizard: 1

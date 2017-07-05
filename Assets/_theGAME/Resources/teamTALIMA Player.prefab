@@ -40,11 +40,11 @@ GameObject:
   - component: {fileID: 33472319445237934}
   - component: {fileID: 136347516625275618}
   - component: {fileID: 23384379424360506}
-  - component: {fileID: 54227117626084650}
   - component: {fileID: 114698527043586634}
   - component: {fileID: 114019161044576486}
   - component: {fileID: 114650690372497238}
-  - component: {fileID: 114658811451984868}
+  - component: {fileID: 143691065690980838}
+  - component: {fileID: 54091637229710798}
   m_Layer: 8
   m_Name: teamTALIMA Player
   m_TagString: Untagged
@@ -193,7 +193,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1533057662892516}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!54 &54227117626084650
+--- !u!54 &54091637229710798
 Rigidbody:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -337,23 +337,10 @@ MonoBehaviour:
   playerCanvas: {fileID: 0}
   txtPlayerUsername: {fileID: 0}
   playerSpeed: 3
-  jumpForce: 5
+  jumpForce: 4
   rotationSlerpSpeed: 124
   playerReach: 3
   heldItem: {fileID: 0}
---- !u!114 &114658811451984868
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1416093075307488}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 1
 --- !u!114 &114698527043586634
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -376,7 +363,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 114019161044576486}
   - {fileID: 114650690372497238}
-  - {fileID: 114658811451984868}
+  - {fileID: 0}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
@@ -427,6 +414,23 @@ CapsuleCollider:
   m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!143 &143691065690980838
+CharacterController:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1416093075307488}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!222 &222848785144458798
 CanvasRenderer:

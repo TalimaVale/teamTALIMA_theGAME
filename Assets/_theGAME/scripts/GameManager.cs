@@ -14,7 +14,7 @@ public class GameManager : PunBehaviour {
     public GameObject playerPrefab;
 
     [Tooltip("Array of player spawn points")]
-    public SpawnPoint[] spawnPoints;
+    public PlayerSpawnPoint[] spawnPoints;
 
     void Awake() {
         // Check if instance already exists, if not set instance to 'this', if instance is not 'this' destory 'this'
@@ -23,7 +23,7 @@ public class GameManager : PunBehaviour {
 
         customOps = FindObjectOfType<NetworkManager>().GetComponent<CustomOperations>();
 
-        spawnPoints = FindObjectsOfType<SpawnPoint>();
+        spawnPoints = FindObjectsOfType<PlayerSpawnPoint>();
     }
 
     void Start() {

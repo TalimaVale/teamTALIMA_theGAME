@@ -27,12 +27,9 @@ public class PlayerController : PunBehaviour {
 
     // Player interaction
     public float playerReach = 3.0f;
+    public Vector3 holdLocalVector = new Vector3(0.0f, 0.5f, 1.1f);
     public GameObject heldItem;
     private bool hasItem;
-
-    //public Vector3 ScreenOffset = new Vector3(0f, 30f, 0f);
-    //public float _characterControllerHeight = 0f;
-    //public Vector3 _targetPosition;
 
     void Awake() {
         gameManager = FindObjectOfType<GameManager>();
@@ -69,7 +66,7 @@ public class PlayerController : PunBehaviour {
         hasItem = (heldItem == null) ? false : true;
 
         if (Input.GetButtonDown("Interact")) {
-            if (hasItem != false) {
+            if (hasItem) {
                 Debug.Log("Interacting with our heldItem");
                 heldItem.SendMessage("Interact", photonView.viewID, SendMessageOptions.RequireReceiver);
             } else {
@@ -82,20 +79,52 @@ public class PlayerController : PunBehaviour {
                 }
             }
         }
-        
+
         // Player movement
         var x = Input.GetAxis("Horizontal") * Time.deltaTime * playerSpeed;
         var z = Input.GetAxis("Vertical") * Time.deltaTime * playerSpeed;
-        
+
         if (Input.GetMouseButton(0) && Input.GetMouseButton(1)) {
             if (z == 0) z = 1 * Time.deltaTime * 3.0f;
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
         } else if (!Input.GetMouseButton(0) && (x != 0f || z != 0f)) {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
         }
-        
+
         rb.MovePosition(transform.position + transform.rotation * new Vector3(x, 0.0f, z));
         if (Input.GetButtonDown("Jump")) rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+
+        /*
+        // Player Movement
+        Vector3 moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+
+        if (Input.GetMouseButton(0) && Input.GetMouseButton(1)) {
+            if (moveDirection.z == 0) moveDirection.z = 1;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+        } else if (!Input.GetMouseButton(0) && (moveDirection.x != 0f || moveDirection.z != 0f)) {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+        }
+
+        moveDirection = transform.TransformDirection(moveDirection);
+        moveDirection *= playerSpeed;
+
+        if (controller.isGrounded && Input.GetButton("Jump"))
+            moveDirection.y = jumpHeight;
+
+        //if (controller.isGrounded && Input.GetButtonDown("Jump")) jumping = true;
+
+        //if (jumping) {
+        //    moveDirection.y = Mathf.Lerp(transform.position.y, transform.position.y + jumpHeight, Time.deltaTime);
+        //    if (transform.position.y >= jumpHeight) jumping = false;
+        //} else if (!jumping && !controller.isGrounded) {
+        //    moveDirection.y -= gravity * Time.deltaTime;
+        //    Debug.Log(moveDirection.y);
+        //}
+
+        moveDirection.y -= gravity * Time.deltaTime;
+        controller.Move(moveDirection * Time.deltaTime);
+        */
     }
 
     void LateUpdate() {
@@ -108,17 +137,17 @@ public class PlayerController : PunBehaviour {
             if (cameraController.distance <= cameraController.curDistance) {
                 cameraController.distance = Mathf.Clamp(cameraController.distance - fadeRate * 3, 0, cameraController.distanceMax);
                 playerFade(-1.0f);
-            // else if zooming from 1st person
+                // else if zooming from 1st person
             } else {
                 cameraController.distance += fadeRate;
                 if (cameraController.curDistance > 1f) {
                     playerFade(fadeRate);
                 }
             }
-        // if camera is within 3rd-person view distance
+            // if camera is within 3rd-person view distance
         } else if (cameraController.curDistance > 2.5f) {
             playerFade(1);
-        // if camera is "between" optimal view distances, correct alpha if necesary
+            // if camera is "between" optimal view distances, correct alpha if necesary
         } else if (this.GetComponent<MeshRenderer>().material.color.a != 1) {
             cameraController.distance += fadeRate;
             playerFade(fadeRate);
@@ -130,11 +159,27 @@ public class PlayerController : PunBehaviour {
         if (other.CompareTag("Respawn Shield")) Respawn();
     }
 
+    private void OnDestroy() {
+        if (photonView.isMine && heldItem != null) {
+            RaycastHit hit;
+            if (Physics.BoxCast(transform.position, new Vector3(.5f, .5f, .5f), Vector3.down, out hit, heldItem.transform.rotation, Mathf.Infinity, -1)) {
+                Debug.Log("hit.distance: " + hit.distance);
+                hit.point += new Vector3(0, heldItem.transform.localScale.y / 2, 0);
+                heldItem.transform.position = hit.point;
+            } else {
+                Debug.Log("No hits detected. Drop heldItem at player's transform.position");
+                heldItem.transform.position = transform.position;
+            }
+            heldItem.layer = LayerMask.NameToLayer("Interact");
+            heldItem.transform.parent = null;
+        }
+    }
+
     void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info) {
         if (stream.isWriting) {
-            stream.SendNext(hasItem);
+            //stream.SendNext(hasItem);
         } else {
-            hasItem = (bool)stream.ReceiveNext();
+            //hasItem = (bool)stream.ReceiveNext();
         }
     }
 
@@ -145,7 +190,7 @@ public class PlayerController : PunBehaviour {
         Vector3 spawnPoint = new Vector3(0, 3, 0);
 
         // If array of spawn points exists, choose a random one
-        SpawnPoint[] spawnPoints = gameManager.spawnPoints;
+        PlayerSpawnPoint[] spawnPoints = gameManager.spawnPoints;
         if (spawnPoints != null && spawnPoints.Length > 0) {
             spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
         }
@@ -179,8 +224,8 @@ public class PlayerController : PunBehaviour {
         closest = closestFound;
         return closestFound != null;
     }
-
-    public void TransferObjectOwnership(PhotonPlayer requestingPlayer) {
-        photonView.TransferOwnership(requestingPlayer.ID);
-    }
 }
+
+// TODO: Fix Player Jump (can multi-jump)
+// TODO: If player hasItem, then turn on heldItem collider
+// TODO: Consider -- When player is holding an item, scale item down

@@ -63,4 +63,10 @@ MonoBehaviour:
   - OnPhotonSerializeView
   - SetPositionData
   - SetBlockData
+  - MinigameReset
+  - SetStackedBlockData
+  - StackBlock
+  - CollectBlocks
+  - SetConsoleData
+  - Collect
   DisableAutoOpenWizard: 1

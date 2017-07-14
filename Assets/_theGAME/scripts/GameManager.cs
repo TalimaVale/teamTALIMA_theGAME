@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Photon;
 
 public class GameManager : PunBehaviour {
@@ -16,6 +17,9 @@ public class GameManager : PunBehaviour {
     [Tooltip("Array of player spawn points")]
     public PlayerSpawnPoint[] spawnPoints;
 
+    // UI Elements
+    public Text txtBawesomeness;
+
     void Awake() {
         // Check if instance already exists, if not set instance to 'this', if instance is not 'this' destory 'this'
         if (instance == null) instance = this;
@@ -24,6 +28,8 @@ public class GameManager : PunBehaviour {
         customOps = FindObjectOfType<NetworkManager>().GetComponent<CustomOperations>();
 
         spawnPoints = FindObjectsOfType<PlayerSpawnPoint>();
+
+        txtBawesomeness.text = "Bawesomeness:";
     }
 
     void Start() {

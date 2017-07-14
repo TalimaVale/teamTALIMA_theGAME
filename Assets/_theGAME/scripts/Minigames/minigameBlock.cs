@@ -1,52 +1,32 @@
 using UnityEngine;
 using Photon;
 
-public class minigameBlock : PunBehaviour, IPunObservable {
+public class minigameBlock : PunBehaviour {
 
     public minigameBlockStackConsole console;
+
+    // heldItem dropDistance
     public float dropDistance = 5.0f;
 
     private PlayerController owner;
     public bool hasOwner { get { return (owner != null); } }
 
+    public bool stacked = false;
+
     void Awake() {
         gameObject.SetActive(false);
+        console = FindObjectOfType<minigameBlockStackConsole>();
+        console.Blocks.Add(gameObject);
     }
 
     public override void OnPhotonPlayerConnected(PhotonPlayer player) {
+        // If we are the MasterClient
         if (photonView.isMine) {
             if (hasOwner) {
-                photonView.RPC("SetBlockData", player, transform.position, transform.rotation, owner.photonView.viewID);
+                photonView.RPC("SetBlockData", player, transform.position, transform.rotation, owner.photonView.viewID, stacked);
             } else {
-                photonView.RPC("SetBlockData", player, transform.position, transform.rotation, 0);
+                photonView.RPC("SetBlockData", player, transform.position, transform.rotation, 0, stacked);
             }
-        }
-    }
-
-    [PunRPC]
-    void SetBlockData(Vector3 pos, Quaternion rot, int ownerViewID) {
-        // if block has owner
-        if (ownerViewID != 0) {
-            owner = PhotonView.Find(ownerViewID).GetComponent<PlayerController>();
-            owner.heldItem = gameObject;
-            gameObject.layer = LayerMask.NameToLayer("Player");
-
-            transform.SetParent(owner.transform, true);
-            transform.localPosition = owner.holdLocalVector;
-            transform.localRotation = Quaternion.identity;
-        // else if no owner
-        } else {
-            transform.position = pos;
-            transform.rotation = rot;
-        }
-        gameObject.SetActive(true);
-    }
-
-    void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
-        if (stream.isWriting) {
-            //
-        } else {
-            //
         }
     }
 
@@ -55,19 +35,48 @@ public class minigameBlock : PunBehaviour, IPunObservable {
 
         if (!hasOwner) {
             if (interactingPlayer.GetComponent<PlayerController>().heldItem != null) return;
-            Debug.Log("Block is PICKED UP by player: " + interactingPlayer.GetPhotonView().owner.NickName);
-            photonView.RPC("PickUpBlock", PhotonTargets.AllBuffered, playerViewID);
+            photonView.RPC("PickUpBlock", PhotonTargets.All, playerViewID);
 
         } else if (hasOwner && owner.photonView.viewID == playerViewID) {
-            Debug.Log("Block is DROPPED by player: " + interactingPlayer.GetPhotonView().owner.NickName);
-            photonView.RPC("DropBlock", PhotonTargets.AllBuffered);
+            photonView.RPC("DropBlock", PhotonTargets.All);
 
-        } else {
-            Debug.Log("Attempt made to steal block");
-        }
+        } else Debug.Log("Attempt made to steal block");
     }
 
-    [PunRPC]
+
+
+    /* RPC CALLS */
+
+    [PunRPC] // called by MasterClient to OnPhotonPlayerConnected
+    void SetBlockData(Vector3 pos, Quaternion rot, int ownerViewID, bool isStacked) {
+        Debug.Log("<Color=Magenta>SetBlockData()</Color> -- Calling SetBlockData");
+
+        // if block has owner
+        if (ownerViewID != 0) {
+            owner = PhotonView.Find(ownerViewID).GetComponent<PlayerController>();
+            owner.heldItem = gameObject;
+            gameObject.layer = LayerMask.NameToLayer("Player");
+
+            transform.SetParent(owner.transform);
+            transform.localPosition = owner.holdLocalVector;
+            transform.localRotation = Quaternion.identity;
+        // else if block is stacked
+        } else if (isStacked) {
+            transform.position = pos;
+            transform.rotation = rot;
+
+            GetComponent<BoxCollider>().enabled = false;
+            gameObject.layer = 0;
+            stacked = isStacked;
+        // else block is free
+        } else {
+            transform.position = pos;
+            transform.rotation = rot;
+        }
+        gameObject.SetActive(true);
+    }
+
+    [PunRPC] // called to All
     public void PickUpBlock(int playerViewID) {
         Debug.Log("<Color=Magenta>PickUpBlock()</Color> -- Calling PickUpBlock");
 
@@ -75,13 +84,15 @@ public class minigameBlock : PunBehaviour, IPunObservable {
         owner.heldItem = gameObject;
         gameObject.layer = LayerMask.NameToLayer("Player");
 
-        transform.SetParent(owner.transform, true);
+        transform.SetParent(owner.transform);
         transform.localPosition = owner.holdLocalVector;
         transform.localRotation = Quaternion.identity;
     }
 
-    [PunRPC]
+    [PunRPC] // called to All
     void DropBlock() {
+        Debug.Log("<Color=Magenta>DropBlock()</Color> -- Calling DropBlock");
+
         // Attempt to find 'ground'
         RaycastHit hit;
         if (Physics.BoxCast(owner.transform.position, new Vector3(.35f, .35f, .35f), Vector3.down, out hit, transform.rotation, dropDistance, -1)) {
@@ -91,15 +102,14 @@ public class minigameBlock : PunBehaviour, IPunObservable {
             owner.heldItem = null;
             owner = null;
             gameObject.layer = LayerMask.NameToLayer("Interact");
-            transform.SetParent(null, true);
-        } else {
-            Debug.Log("No ground detected. Cannot drop block here.");
-        }
+            transform.SetParent(null);
 
-        // Console attempts to collect blocks
-        console.CollectBlocks();
+            // Console attempts to collect dropped blocks
+            console.photonView.RPC("CollectBlocks", PhotonTargets.MasterClient);
+        } else Debug.Log("No ground detected. Cannot drop block here.");
     }
 }
 
 // TODO: Improve (RPC)DropBlock Raycast, so blocks drop right in front of player (would require more complicated raycast)
 // TODO: Take blocks off of camera script
+// TODO: After block is held by player, that player sees the block as opaque (shader alpha channel moves from 200 to 255)

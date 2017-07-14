@@ -9,6 +9,8 @@ public class PlayerController : PunBehaviour {
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject localPlayer;
 
+    private int bawesomeness = 0;
+
     // Player camera
     Camera mainCamera;
     CameraController cameraController;
@@ -56,7 +58,10 @@ public class PlayerController : PunBehaviour {
 
         if (photonView.isMine) {
             GetComponent<MeshRenderer>().material.color = new Color(8 / 255f, 168 / 255f, 241 / 255f, 1);
+            gameManager.txtBawesomeness.text = "Bawesomeness: " + bawesomeness;
         }
+
+        Debug.Log("Our current bawesomeness: " + bawesomeness);
     }
 
     void Update() {
@@ -93,38 +98,6 @@ public class PlayerController : PunBehaviour {
 
         rb.MovePosition(transform.position + transform.rotation * new Vector3(x, 0.0f, z));
         if (Input.GetButtonDown("Jump")) rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-
-
-        /*
-        // Player Movement
-        Vector3 moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-
-        if (Input.GetMouseButton(0) && Input.GetMouseButton(1)) {
-            if (moveDirection.z == 0) moveDirection.z = 1;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
-        } else if (!Input.GetMouseButton(0) && (moveDirection.x != 0f || moveDirection.z != 0f)) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
-        }
-
-        moveDirection = transform.TransformDirection(moveDirection);
-        moveDirection *= playerSpeed;
-
-        if (controller.isGrounded && Input.GetButton("Jump"))
-            moveDirection.y = jumpHeight;
-
-        //if (controller.isGrounded && Input.GetButtonDown("Jump")) jumping = true;
-
-        //if (jumping) {
-        //    moveDirection.y = Mathf.Lerp(transform.position.y, transform.position.y + jumpHeight, Time.deltaTime);
-        //    if (transform.position.y >= jumpHeight) jumping = false;
-        //} else if (!jumping && !controller.isGrounded) {
-        //    moveDirection.y -= gravity * Time.deltaTime;
-        //    Debug.Log(moveDirection.y);
-        //}
-
-        moveDirection.y -= gravity * Time.deltaTime;
-        controller.Move(moveDirection * Time.deltaTime);
-        */
     }
 
     void LateUpdate() {
@@ -181,6 +154,15 @@ public class PlayerController : PunBehaviour {
         } else {
             //hasItem = (bool)stream.ReceiveNext();
         }
+    }
+
+    public void AddBawesomeness(int value) {
+        if (!photonView.isMine) return;
+
+        bawesomeness += value;
+        gameManager.txtBawesomeness.text = "Bawesomeness: " + bawesomeness;
+
+        Debug.Log("Our current bawesomeness: " + bawesomeness);
     }
 
     public void Respawn() {

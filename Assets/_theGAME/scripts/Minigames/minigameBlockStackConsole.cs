@@ -221,7 +221,7 @@ public class minigameBlockStackConsole : PunBehaviour {
 
         // Reward players
         for (int i = 0; i < playerCount; i++) {
-            GameObject coin = PhotonNetwork.InstantiateSceneObject("Awesomeness", transform.position, Quaternion.Euler(0.0f, 0.0f, -90.0f), 0, null);
+            GameObject coin = PhotonNetwork.InstantiateSceneObject("Reward Awesomeness", transform.position, Quaternion.Euler(0.0f, 0.0f, -90.0f), 0, null);
 
             // Coin's endpoint = random direction * distance from console + console's position
             Vector3 endPoint = Quaternion.Euler(0, Random.Range(-180f, 180f), 0) * new Vector3(0.0f, 0.0f, 4.0f) + transform.position;
@@ -256,7 +256,6 @@ public class minigameBlockStackConsole : PunBehaviour {
 
         if (coinTransform != null) {
             coinTransform.position = endPoint;
-            Debug.Log("endPoint: " + endPoint + ", and coinTransform.position: " + coinTransform.position);
         }
     }
 
@@ -297,16 +296,19 @@ public class minigameBlockStackConsole : PunBehaviour {
 // TODO: Create and implement a method for RPC's Debug.Log line.
 
 
-// Fix bug where Awesomeness coin sometimes does not reach proper endPoint
-// Consider adjusting archPoint so players right next to console cannot 'intercept' coins before they arch
+
+// Adjust block stacking distances
 
 // Add winTimer to console (when MinigameWin() is called, change a visual for # of secs to indicate completion, then run MinigameWin())
 
 // Develop system so each player can only collect one 'minigame reward' awesomeness coin
 // After # of seconds, free-for-all on awesomeness coins
+// Consider adjusting archPoint so players right next to console cannot 'intercept' coins before they arch
 
 
 
 // After minigame, fix up player movement/physics/lag
 // Hide coin upon collection
 // Reposition block upon 'stacking' drop
+
+// Build Terrain

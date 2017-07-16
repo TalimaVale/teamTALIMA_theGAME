@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 114168437715197854}
   - component: {fileID: 114260599724546548}
   - component: {fileID: 65437245357164386}
+  - component: {fileID: 95894558015099524}
   m_Layer: 9
   m_Name: Minigame Block
   m_TagString: Untagged
@@ -37,13 +38,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1620640773149022}
-  m_LocalRotation: {x: 0.32664078, y: 0.29516026, z: 0.13529904, w: 0.8876263}
+  m_LocalRotation: {x: 0.27984518, y: -0.11591566, z: 0.3647056, w: 0.88047725}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 30, y: 45, z: 30}
+  m_LocalEulerAnglesHint: {x: 35.264, y: 0, z: 45}
 --- !u!23 &23520900481190518
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -95,6 +96,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &95894558015099524
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1620640773149022}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: cba01defea61c2c4784808b74e6cba31, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114168437715197854
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -134,3 +152,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   console: {fileID: 0}
   dropDistance: 5
+  stacked: 0

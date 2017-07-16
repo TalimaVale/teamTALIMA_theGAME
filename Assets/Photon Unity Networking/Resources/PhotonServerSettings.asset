@@ -69,4 +69,5 @@ MonoBehaviour:
   - CollectBlocks
   - SetConsoleData
   - Collect
+  - CoinArch
   DisableAutoOpenWizard: 1

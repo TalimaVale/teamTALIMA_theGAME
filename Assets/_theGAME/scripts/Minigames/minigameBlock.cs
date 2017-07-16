@@ -5,8 +5,10 @@ public class minigameBlock : PunBehaviour {
 
     public minigameBlockStackConsole console;
 
-    // heldItem dropDistance
+
+    // heldItem acceptable dropDistance
     public float dropDistance = 5.0f;
+    private float dropHover = 0.45f;
 
     private PlayerController owner;
     public bool hasOwner { get { return (owner != null); } }
@@ -96,7 +98,7 @@ public class minigameBlock : PunBehaviour {
         // Attempt to find 'ground'
         RaycastHit hit;
         if (Physics.BoxCast(owner.transform.position, new Vector3(.35f, .35f, .35f), Vector3.down, out hit, transform.rotation, dropDistance, -1)) {
-            hit.point += new Vector3(0, transform.localScale.y / 2, 0);
+            hit.point += new Vector3(0, (transform.localScale.y / 2) + dropHover, 0);
             transform.position = hit.point;
             
             owner.heldItem = null;

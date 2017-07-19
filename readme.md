@@ -45,9 +45,9 @@ There is a specific folder in our project for new asset contributions. Look for 
 
 theGAME’s art style is fluid, and art assets will rarely be rejected on the basis of not conforming closely enough to the current visuals. Be creative! We want to see what you can do.
 
-That being said, a collection of ‘concept art’ (screenshots of other games) pieces which our art style is derived from can be found here: [Concept Art Styles](../master/ConceptArtStyles)
+That being said, a collection of ‘concept art’ (screenshots of other games) pieces which our art style is derived from can be found here: [Concept Art Styles](../master/ConceptArtStyles.md)
 
-If you are looking for inspiration in choosing an object to contribute, a list of currently desired art assets can be found here: [List of Desired Art Assets](../master/DesiredArtAssets)
+If you are looking for inspiration in choosing an object to contribute, a list of currently desired art assets can be found here: [List of Desired Art Assets](../master/DesiredArtAssets.md)
 
 ### Sound Assets
 When contributing sound assets, each pull request should only deal with one asset. The exception to this is if you are submitting a collection or set of assets, then it is reasonable to submit the entire collection at once if desired.
@@ -58,7 +58,7 @@ There is a specific folder in our project for new asset contributions. Look for 
 
 > *Note:* If you are submitting an asset which must be placed somewhere specific (like the Unity Resources folder), that is acceptable. You may want to note it in the PR description.
 
-If you are looking for inspiration in choosing a sound to contribute, a list of currently desired sound assets can be found here: [List of Desired Sound Assets](../master/DesiredSoundAssets)
+If you are looking for inspiration in choosing a sound to contribute, a list of currently desired sound assets can be found here: [List of Desired Sound Assets](../master/DesiredSoundAssets.md)
 
 ### Playtesting
 Interested in playing or hacking theGAME in an effort to improve the project? Please submit any bugs you find as an Issue. 

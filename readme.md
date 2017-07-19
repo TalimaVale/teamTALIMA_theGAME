@@ -1,3 +1,5 @@
+![teamTALIMA: theGAME](http://teamtalima.com/wp-content/uploads/2017/07/theGAME_screenshot.png "teamTALIMA: theGAME")
+
 # teamTALIMA: theGAME
 Welcome to one of teamTALIMA’s project repos! We are an online, educational development community working on website, chat bot, and game development projects with our primary focus on game development.
 

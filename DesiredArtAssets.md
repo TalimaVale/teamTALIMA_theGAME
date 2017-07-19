@@ -21,3 +21,7 @@ Currently desired art assets include:
 * Player Character (needs to be customizable and animated)
 
 ⋅⋅⋅WIP by teammate
+
+4. And another item.
+
+⋅⋅⋅You ca

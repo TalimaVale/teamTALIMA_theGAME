@@ -4,7 +4,7 @@ Welcome to one of teamTALIMA’s project repos! We are an online, educational de
 ## What is teamTALIMA: theGAME?
 teamTALIMA: theGAME is an ongoing, open source, game development project. theGAME is an online multiplayer game set in an open world environment with RPG/adventure genre attributes. It is inspired from MMOs such as World of Warcraft and Guild Wars 2, adventure games such as The Legend of Zelda series, and open world games such as Skyrim and Minecraft (sandbox genre).
 
-> *Note:* While it will always be an online multiplayer game, there are no current plans to expand into a full MMO architecture.
+> *Note:* While always an online multiplayer game, there are no plans to expand into a full MMO architecture.
 
 theGAME is being developed by teamTALIMA community members as a learning project. Primary development tools include Unity3D, C#, and Photon Framework (handles network code). This repo is managed by Talima (community founder) and our Project Managers, but project contributions can be made by anyone interested in improving their game development skills and/or helping us to improve the project!
 
@@ -45,9 +45,9 @@ There is a specific folder in our project for new asset contributions. Look for 
 
 theGAME’s art style is fluid, and art assets will rarely be rejected on the basis of not conforming closely enough to the current visuals. Be creative! We want to see what you can do.
 
-That being said, a collection of ‘concept art’ (screenshots of other games) pieces which our art style is derived from can be found here: [Concept Art Styles](../blob/master/ConceptArtStyles)
+That being said, a collection of ‘concept art’ (screenshots of other games) pieces which our art style is derived from can be found here: [Concept Art Styles](../master/ConceptArtStyles)
 
-If you are looking for inspiration in choosing an object to contribute, a list of currently desired art assets can be found here: [List of Desired Art Assets](../blob/master/DesiredArtAssets)
+If you are looking for inspiration in choosing an object to contribute, a list of currently desired art assets can be found here: [List of Desired Art Assets](../master/DesiredArtAssets)
 
 ### Sound Assets
 When contributing sound assets, each pull request should only deal with one asset. The exception to this is if you are submitting a collection or set of assets, then it is reasonable to submit the entire collection at once if desired.
@@ -58,7 +58,7 @@ There is a specific folder in our project for new asset contributions. Look for 
 
 > *Note:* If you are submitting an asset which must be placed somewhere specific (like the Unity Resources folder), that is acceptable. You may want to note it in the PR description.
 
-If you are looking for inspiration in choosing a sound to contribute, a list of currently desired sound assets can be found here: [List of Desired Sound Assets](../blob/master/DesiredSoundAssets)
+If you are looking for inspiration in choosing a sound to contribute, a list of currently desired sound assets can be found here: [List of Desired Sound Assets](../master/DesiredSoundAssets)
 
 ### Playtesting
 Interested in playing or hacking theGAME in an effort to improve the project? Please submit any bugs you find as an Issue. 
@@ -69,8 +69,8 @@ Each bug should be represented as an individual Issue, and should contain detail
 Currently, all ‘ideas’ for theGAME should be submitted as an Issue with the label ‘idea’ attached to it. Any ideas or suggestions for new game features or improvements to the development process are always welcome!
 
 ## Who are the Project Managers?
-*Talima (via teamTALIMA acct.)
-*Scryptonite
+* Talima (via teamTALIMA acct.)
+* Scryptonite
 
 ## teamTALIMA Community Links
 [GitHub Repo for BeastieBot](https://github.com/teamTALIMA/BeastieBot "teamTALIMA's BeastieBot Repo")

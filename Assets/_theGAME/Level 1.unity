@@ -190,6 +190,31 @@ Prefab:
       propertyPath: instantiationId
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 198717614339915614, guid: 65adcb721d461424e948cd98fa9208c0,
+        type: 2}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 198717614339915614, guid: 65adcb721d461424e948cd98fa9208c0,
+        type: 2}
+      propertyPath: randomSeed
+      value: -920639253
+      objectReference: {fileID: 0}
+    - target: {fileID: 198717614339915614, guid: 65adcb721d461424e948cd98fa9208c0,
+        type: 2}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 198717614339915614, guid: 65adcb721d461424e948cd98fa9208c0,
+        type: 2}
+      propertyPath: InitialModule.maxNumParticles
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 198717614339915614, guid: 65adcb721d461424e948cd98fa9208c0,
+        type: 2}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 200
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 65adcb721d461424e948cd98fa9208c0, type: 2}
   m_IsPrefabParent: 0

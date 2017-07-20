@@ -25,13 +25,13 @@ public class minigameBlockStackConsole : PunBehaviour {
 
     private float collectDis = 2.0f;
     private Vector3 stackPos;
+    public float stackPadding = 0.6f;
     private int stackTotal = 0;
 
     //private Vector3 winBoxPosition { get { return transform.position + new Vector3(0.0f, 2.01f, 0.0f); } }
     //private Vector3 winBoxExtents = new Vector3(0.5f, 1.5f, 0.5f);
-    //private float winTimer = 0.0f;
-
-    public float winTimeThreshold = 3.0f;
+    
+    private float winTimer = 5.0f;
     public int winTotal = 5;
 
     private float rewardDis = 7.0f;
@@ -50,7 +50,7 @@ public class minigameBlockStackConsole : PunBehaviour {
         gameActive = false;
         consoleCollider = GetComponent<BoxCollider>();
         particleShield = GetComponentInChildren<ParticleSystem>();
-        stackPos = transform.position + new Vector3(0, transform.localScale.y / 2, 0);
+        stackPos = transform.position + new Vector3(0, transform.localScale.y / 2 + stackPadding, 0);
         
         // Win vars
         archPoint = transform.position + new Vector3(1.0f, 7.0f, 0.0f);
@@ -166,7 +166,7 @@ public class minigameBlockStackConsole : PunBehaviour {
                     if (!block.hasOwner) {
                         block.transform.position = stackPos + new Vector3(0, block.transform.localScale.y / 2, 0);
 
-                        stackPos += new Vector3(0, (block.transform.localScale.y), 0);
+                        stackPos += new Vector3(0, (block.transform.localScale.y + stackPadding), 0);
                         stackTotal++;
                         Debug.Log(stackTotal);
 
@@ -196,6 +196,8 @@ public class minigameBlockStackConsole : PunBehaviour {
     [PunRPC] // called to MasterClient
     public void MinigameWin() {
         Debug.Log("<Color=Magenta>MinigameWin()</Color> -- Calling MinigameWin");
+
+        StartCoroutine(WinTimer());
 
         photonView.RPC("SetGameActive", PhotonTargets.All, false);
 
@@ -234,6 +236,20 @@ public class minigameBlockStackConsole : PunBehaviour {
         photonView.RPC("MinigameReset", PhotonTargets.All);
 
         Debug.Log("We win!! Awesomeness for everyone here :)");
+    }
+
+    private IEnumerator WinTimer() {
+        var main = particleShield.main;
+        main.simulationSpeed = 3.0f; //speed
+
+        ParticleSystem.ColorOverLifetimeModule newColor = particleShield.colorOverLifetime;
+        newColor.color = Color.red;
+        main.startColor = newColor.color; //color
+
+        var emission = particleShield.emission;
+        emission.rateOverTime = 300; //emission
+
+        yield return new WaitForSeconds(winTimer);
     }
 
     private IEnumerator CoinArch(Transform coinTransform, Vector3 archPoint, Vector3 endPoint, float duration) {
@@ -297,9 +313,8 @@ public class minigameBlockStackConsole : PunBehaviour {
 
 
 
-// Adjust block stacking distances
-
-// Add winTimer to console (when MinigameWin() is called, change a visual for # of secs to indicate completion, then run MinigameWin())
+// Make MinigameWin() functionality wait for WinTimer
+// Add particleShield variables to MinigameReset()
 
 // Develop system so each player can only collect one 'minigame reward' awesomeness coin
 // After # of seconds, free-for-all on awesomeness coins

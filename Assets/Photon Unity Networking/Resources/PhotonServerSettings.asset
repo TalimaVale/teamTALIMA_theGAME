@@ -70,4 +70,6 @@ MonoBehaviour:
   - SetConsoleData
   - Collect
   - CoinArch
+  - MinigameWinTimer
+  - ParticleShieldWin
   DisableAutoOpenWizard: 1

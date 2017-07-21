@@ -30,11 +30,12 @@ public class minigameBlockStackConsole : PunBehaviour {
 
     //private Vector3 winBoxPosition { get { return transform.position + new Vector3(0.0f, 2.01f, 0.0f); } }
     //private Vector3 winBoxExtents = new Vector3(0.5f, 1.5f, 0.5f);
-    
-    private float winTimer = 5.0f;
-    public int winTotal = 5;
 
-    private float rewardDis = 7.0f;
+    public int winTotal = 5;
+    private float winTimer = 5.0f;
+    private bool winning;
+
+    private float rewardDis = 20.0f;
     public Vector3 archPoint;
     public float archDuration = 2.0f;
 
@@ -66,7 +67,7 @@ public class minigameBlockStackConsole : PunBehaviour {
 
     void Update() {
         if (gameActive) {
-            if (stackTotal >= winTotal && PhotonNetwork.isMasterClient) photonView.RPC("MinigameWin", PhotonTargets.MasterClient);
+            if (stackTotal >= winTotal && PhotonNetwork.isMasterClient && !winning) photonView.RPC("MinigameWinTimer", PhotonTargets.MasterClient);
         } else if (resetTimer <= resetTimeThreshold) resetTimer += Time.deltaTime;
     }
 
@@ -129,7 +130,7 @@ public class minigameBlockStackConsole : PunBehaviour {
 
         gameActive = active;
 
-        if (active) {
+        if (gameActive) {
             consoleCollider.center = new Vector3(0, 3, 0);
             consoleCollider.size = new Vector3(1, 5, 1);
             particleShield.Play();
@@ -194,11 +195,21 @@ public class minigameBlockStackConsole : PunBehaviour {
     }
 
     [PunRPC] // called to MasterClient
-    public void MinigameWin() {
-        Debug.Log("<Color=Magenta>MinigameWin()</Color> -- Calling MinigameWin");
+    public void MinigameWinTimer() {
+        Debug.Log("<Color=Magenta>MinigameWinTimer()</Color> -- Calling MinigameWinTimer");
 
-        StartCoroutine(WinTimer());
+        winning = true;
+        StartCoroutine(MinigameWin());
+    }
 
+    private IEnumerator MinigameWin() {
+        // Change particleShield visually to inform nearby players the minigame has been won
+        photonView.RPC("ParticleShieldWin", PhotonTargets.All);
+        
+        // Wait for winTimer in order to inform nearby players (through particleShield changes) that minigame has been won
+        yield return new WaitForSeconds(winTimer);
+        
+        // Start 'winning' functionality
         photonView.RPC("SetGameActive", PhotonTargets.All, false);
 
         // Destroy minigame blocks
@@ -207,7 +218,7 @@ public class minigameBlockStackConsole : PunBehaviour {
                 PhotonNetwork.Destroy(Block);
             }
         }
-        
+
         // Determine player count
         int playerCount = 0;
         Collider[] Colliders = Physics.OverlapSphere(transform.position, rewardDis);
@@ -231,25 +242,24 @@ public class minigameBlockStackConsole : PunBehaviour {
             // Start coin's coroutine animation
             StartCoroutine(CoinArch(coin.transform, archPoint, endPoint, archDuration));
         }
-        
+
         // Reset minigame variables
         photonView.RPC("MinigameReset", PhotonTargets.All);
 
         Debug.Log("We win!! Awesomeness for everyone here :)");
     }
 
-    private IEnumerator WinTimer() {
-        var main = particleShield.main;
-        main.simulationSpeed = 3.0f; //speed
+    [PunRPC]
+    void ParticleShieldWin() {
+        Debug.Log("<Color=Magenta>ParticleShieldWin()</Color> -- Calling ParticleShieldWin");
 
-        ParticleSystem.ColorOverLifetimeModule newColor = particleShield.colorOverLifetime;
-        newColor.color = Color.red;
-        main.startColor = newColor.color; //color
+        ParticleSystem.MainModule main = particleShield.main;
+        ParticleSystem.EmissionModule emission = particleShield.emission;
+        ParticleSystem.MinMaxGradient newColor = Color.magenta;
 
-        var emission = particleShield.emission;
-        emission.rateOverTime = 300; //emission
-
-        yield return new WaitForSeconds(winTimer);
+        main.simulationSpeed = 3.0f;    // particle speed
+        emission.rateOverTime = 300;    // emission rate
+        main.startColor = newColor;     // particle color
     }
 
     private IEnumerator CoinArch(Transform coinTransform, Vector3 archPoint, Vector3 endPoint, float duration) {
@@ -292,12 +302,21 @@ public class minigameBlockStackConsole : PunBehaviour {
         // Reset particle shield
         particleShield.Stop();
 
+        ParticleSystem.MainModule main = particleShield.main;
+        ParticleSystem.EmissionModule emission = particleShield.emission;
+        ParticleSystem.MinMaxGradient newColor = new Color(255.0f / 255.0f, 251.0f / 255.0f, 233.0f / 255.0f, 150.0f / 255.0f);
+        main.simulationSpeed = 1.0f;    // particle speed
+        emission.rateOverTime = 200;    // emission rate
+        main.startColor = newColor;     // particle color
+
         // Reset stack variables
-        stackPos = transform.position + new Vector3(0, transform.localScale.y / 2, 0);
+        stackPos = transform.position + new Vector3(0, transform.localScale.y / 2 + stackPadding, 0);
         stackTotal = 0;
 
+        // Reset winning boolean
+        winning = false;
+
         // Reset timers
-        //winTimer = 0.0f;
         resetTimer = 0.0f;
     }
 
@@ -310,14 +329,18 @@ public class minigameBlockStackConsole : PunBehaviour {
 
 // TODO: spawnPoints array isUse boolean not synced. Consider -- InstantiateBlock an RPC and sync inUse to PT.All and OnPhotonPlayerConnect
 // TODO: Create and implement a method for RPC's Debug.Log line.
+// TODO: Consider adding UI Text element for MinigameWinTimer. Visual countdown to reward
 
 
 
-// Make MinigameWin() functionality wait for WinTimer
-// Add particleShield variables to MinigameReset()
+// Develop system for 'reward' awesomeness
+// Players can only collect one coin of reward awesomeness within the first # of seconds of the reward spawning
 
-// Develop system so each player can only collect one 'minigame reward' awesomeness coin
-// After # of seconds, free-for-all on awesomeness coins
+// All 'reward' awesomeness contains a collect timer of a # of seconds
+// When a player collects a 'reward' awesomeness coin, coin's collect timer is added to player as a 'reward' awesomeness collect cooldown
+// Once player's collect cooldown expires (reaches 0), player can collect more 'reward' awesomeness
+// If 'reward' awesomeness's collect timer is 0 when a player trys to collect it, no cooldown is added to the player
+
 // Consider adjusting archPoint so players right next to console cannot 'intercept' coins before they arch
 
 
@@ -326,4 +349,4 @@ public class minigameBlockStackConsole : PunBehaviour {
 // Hide coin upon collection
 // Reposition block upon 'stacking' drop
 
-// Build Terrain
+// Build Terrain (marching cubes)

@@ -4,7 +4,7 @@
 Welcome to one of teamTALIMA’s project repos! We are an online, educational development community working on website, chat bot, and game development projects with our primary focus on game development.
 
 ### Table of Contents
-* [What is teamTALIMA: theGAME](#what-is-teamtalima:-thegame)
+* [What is teamTALIMA: theGAME](#what-is-teamtalima-thegame)
 * [Playing theGAME](#can-i-play-thegame) 
 * [Contributing to theGAME project](#can-i-contribute-to-thegame-project)
   * [Programming](#programming)

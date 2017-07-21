@@ -3,6 +3,19 @@
 # teamTALIMA: theGAME
 Welcome to one of teamTALIMA’s project repos! We are an online, educational development community working on website, chat bot, and game development projects with our primary focus on game development.
 
+### Table of Contents
+* [What is teamTALIMA: theGAME](#what-is-teamtalima:-thegame)
+* [Playing theGAME](#can-i-play-thegame) 
+* [Contributing to theGAME project](#can-i-contribute-to-thegame-project)
+  * [Programming](#programming)
+  * [Art Assets](#art-assets)
+  * [Sound Assets](#sound-assets)
+  * [Playtesting](#playtesting) 
+  * [New Feature Ideas](#new-feature-ideas) 
+* [Who are the Project Managers](#who-are-the-project-managers) 
+* [teamTALIMA Community Links](#teamtalima-community-links) 
+* [License](#license) 
+
 ## What is teamTALIMA: theGAME?
 teamTALIMA: theGAME is an ongoing, open source, game development project. theGAME is an online multiplayer game set in an open world environment with RPG/adventure genre attributes. It is inspired from MMOs such as World of Warcraft and Guild Wars 2, adventure games such as The Legend of Zelda series, and open world games such as Skyrim and Minecraft (sandbox genre).
 

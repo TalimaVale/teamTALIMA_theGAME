@@ -19,7 +19,7 @@ public class Ghostify : MonoBehaviour {
         // ^ These two are the only lines you need to get the standard shader to 
         //   write to the z-buffer regardless of the material being Transparent or Fade.
         // - Setting the renderQueue is more or less to help you stop z-buffer problems 
-        //   with multiple ghost objects. 2500 for the Player, 2501 for the Visor, etc...
+        //   with multiple ghost objects. 3000 for the Player, 3001 for the Visor, etc...
     }
 
     void OnValidate() {

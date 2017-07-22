@@ -7,12 +7,14 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: ttBlue
-  m_Shader: {fileID: 4800000, guid: 3a5515e22bc2d7d499ef99804543dda5, type: 3}
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: _ALPHABLEND_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Transparent
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -113,7 +115,7 @@ Material:
     - _SquashAmount: 1
     - _SrcBlend: 5
     - _UVSec: 0
-    - _ZWrite: 0
+    - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0.03137255, g: 0.65882355, b: 0.94509804, a: 1}
     - _Emission: {r: 0, g: 0, b: 0, a: 0}

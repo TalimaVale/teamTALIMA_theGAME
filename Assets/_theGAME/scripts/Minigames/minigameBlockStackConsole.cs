@@ -228,6 +228,7 @@ public class minigameBlockStackConsole : PunBehaviour {
                 if (pcon != null) {
                     Debug.Log("We found another player!" + pcon.name);
                     playerCount++;
+                    playerCount++;
                 }
             }
         }

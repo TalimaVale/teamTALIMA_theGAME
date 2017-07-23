@@ -33,6 +33,10 @@ public class PlayerController : PunBehaviour {
     public GameObject heldItem;
     private bool hasItem;
 
+    public double collectCooldown = 0;
+    public double collectCountdown = 0;
+    private double cdInitTime;
+
     void Awake() {
         gameManager = FindObjectOfType<GameManager>();
 
@@ -83,6 +87,15 @@ public class PlayerController : PunBehaviour {
                     Debug.Log("No Interact object within playerReach");
                 }
             }
+        }
+
+        // Reward Awesomeness Cooldown
+        if (collectCountdown > 0) {
+            double diff = PhotonNetwork.time - cdInitTime;
+            collectCountdown = collectCooldown - diff;
+
+            if (collectCountdown < 0) collectCountdown = 0;
+            //Debug.Log("Player cooldown: " + collectCountdown);
         }
 
         // Player movement
@@ -156,13 +169,22 @@ public class PlayerController : PunBehaviour {
         }
     }
 
-    public void AddBawesomeness(int value) {
+    public void AddBawesomeness(int value, double cooldown = 0, double netTimestamp = 0) {
+        Debug.Log("Calling AddBawesomeness");
         if (!photonView.isMine) return;
+        Debug.Log("Calling AddBawesomeness, photonView.isMine");
 
         bawesomeness += value;
         gameManager.txtBawesomeness.text = "Bawesomeness: " + bawesomeness;
-
         Debug.Log("Our current bawesomeness: " + bawesomeness);
+
+        if(cooldown != 0) {
+            collectCooldown = cooldown;
+            collectCountdown = collectCooldown;
+            Debug.Log("player.collectCountdown = " + collectCountdown);
+            cdInitTime = netTimestamp;
+            //Debug.Log("Player's collectCooldown is: " + collectCooldown);
+        }
     }
 
     public void Respawn() {

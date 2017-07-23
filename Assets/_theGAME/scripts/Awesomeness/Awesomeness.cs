@@ -9,20 +9,25 @@ using Photon;
 
 public class Awesomeness : PunBehaviour {
 
-    int value = 1;
+    public int value = 1;
 
-    private void OnTriggerEnter(Collider other) {
+    protected void OnTriggerEnter(Collider other) {
         Debug.Log(other.name);
         PlayerController player = other.GetComponent<PlayerController>();
 
-        if (player != null) {
-            player.AddBawesomeness(value);
-            photonView.RPC("Collect", PhotonTargets.MasterClient, photonView.viewID);
+        if (player != null && player.GetComponent<PhotonView>().isMine) {
+            CallAddBawesomeness(player);
         }
+    }
+
+    virtual public void CallAddBawesomeness(PlayerController player) {
+        player.AddBawesomeness(value);
+        photonView.RPC("Collect", PhotonTargets.MasterClient, photonView.viewID);
     }
 
     [PunRPC]
     void Collect(int viewID) {
+        Debug.Log("Awesomeness Collect RPC");
         PhotonNetwork.Destroy(PhotonView.Find(viewID).gameObject);
     }
 }

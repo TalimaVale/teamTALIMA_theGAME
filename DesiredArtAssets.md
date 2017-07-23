@@ -13,6 +13,7 @@ Currently desired art assets include:
 * Barrel
 * Crate
 * Door (seperate model so we can animate/interact with it)
+* Tree
 * Shopkeeper
   * WIP by MrBodeci
 * Player Character (needs to be customizable and animated)

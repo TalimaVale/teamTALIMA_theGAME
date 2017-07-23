@@ -7,7 +7,7 @@ Currently desired art assets include:
 * Repeatable Fence Piece (for farms/front yards/along pathways)
 * One-story Village House
   * WIP by RacoonMedia
-* Hay Bail
+* Hay Bale
 * Grass
 * Flower (multiple petal colors)
 * Barrel

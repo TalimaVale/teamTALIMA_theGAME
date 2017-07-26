@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 [AddComponentMenu("Camera Controllers/Better Mouse Orbit")]
 public class CameraController : MonoBehaviour
@@ -69,9 +69,9 @@ public class CameraController : MonoBehaviour
 
             // cursor locked?
             if (panLocksMouse) {
-                Cursor.lockState = mouseButtonActive ? CursorLockMode.Confined : CursorLockMode.None;
+                MousePointer.lockState = mouseButtonActive ? CursorLockMode.Locked : CursorLockMode.None;
                 // cursor visible when mouse is not active
-                Cursor.visible = !mouseButtonActive;
+                MousePointer.visible = !mouseButtonActive;
             }
 
             if (mouseButtonActive)

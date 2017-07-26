@@ -43,4 +43,33 @@ MonoBehaviour:
   - RequestForPickupItems
   - RequestForPickupTimes
   - TaggedPlayer
+  - InstantiateBlock
+  - SetParent
+  - PickUpBlock
+  - DropBlock
+  - SetBlockParent
+  - MinigameWin
+  - MinigameSetup
+  - SetGameRunning
+  - DestroyBlocks
+  - InstantiatePrefabInScene
+  - SetGameActive
+  - ForceSync
+  - RemoveAllBufferedRPCs
+  - UpdateTransform
+  - InstantiateBlockInScene
+  - RespawnBlock
+  - AddToBlocks
+  - OnPhotonSerializeView
+  - SetPositionData
+  - SetBlockData
+  - MinigameReset
+  - SetStackedBlockData
+  - StackBlock
+  - CollectBlocks
+  - SetConsoleData
+  - Collect
+  - CoinArch
+  - MinigameWinTimer
+  - ParticleShieldWin
   DisableAutoOpenWizard: 1

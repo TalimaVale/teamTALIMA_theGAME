@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Photon;
 
 public class GameManager : PunBehaviour {
@@ -14,7 +15,10 @@ public class GameManager : PunBehaviour {
     public GameObject playerPrefab;
 
     [Tooltip("Array of player spawn points")]
-    public SpawnPoint[] spawnPoints;
+    public PlayerSpawnPoint[] spawnPoints;
+
+    // UI Elements
+    public Text txtBawesomeness;
 
     void Awake() {
         // Check if instance already exists, if not set instance to 'this', if instance is not 'this' destory 'this'
@@ -23,7 +27,9 @@ public class GameManager : PunBehaviour {
 
         customOps = FindObjectOfType<NetworkManager>().GetComponent<CustomOperations>();
 
-        spawnPoints = FindObjectsOfType<SpawnPoint>();
+        spawnPoints = FindObjectsOfType<PlayerSpawnPoint>();
+
+        txtBawesomeness.text = "Bawesomeness:";
     }
 
     void Start() {
@@ -31,7 +37,7 @@ public class GameManager : PunBehaviour {
             Debug.LogError("<Color=Red>Missing</Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'");
         } else if (PlayerController.localPlayer == null) {
             Debug.Log("We are Instantiating LocalPlayer from " + SceneManager.GetActiveScene().name);
-            PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0);
+            PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0);
         }
     }
 
@@ -40,9 +46,13 @@ public class GameManager : PunBehaviour {
             customOps.OpHelloWorld();
         }
     }
+
+    public override void OnOwnershipRequest(object[] viewAndPlayer) {
+        Debug.Log("ONOWNERSHIPREQUEST()");
+        PhotonView view = viewAndPlayer[0] as PhotonView;
+        PhotonPlayer requestingPlayer = viewAndPlayer[1] as PhotonPlayer;
+
+        Debug.Log("OnOwnershipRequest(): Player " + requestingPlayer + " requests ownership of: " + view + ".");
+        view.TransferOwnership(requestingPlayer.ID);
+    }
 }
-
-
-
-// #username#exppoints#money
-// #username2#exppoints#money

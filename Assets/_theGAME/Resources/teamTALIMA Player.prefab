@@ -40,10 +40,11 @@ GameObject:
   - component: {fileID: 33472319445237934}
   - component: {fileID: 136347516625275618}
   - component: {fileID: 23384379424360506}
-  - component: {fileID: 54227117626084650}
   - component: {fileID: 114698527043586634}
   - component: {fileID: 114019161044576486}
   - component: {fileID: 114650690372497238}
+  - component: {fileID: 143691065690980838}
+  - component: {fileID: 54091637229710798}
   - component: {fileID: 114965930464659220}
   m_Layer: 8
   m_Name: teamTALIMA Player
@@ -194,7 +195,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1533057662892516}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!54 &54227117626084650
+--- !u!54 &54091637229710798
 Rigidbody:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -347,12 +348,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeRate: 0.02
-  rotationSlerpSpeed: 124
   playerCanvas: {fileID: 0}
-  ScreenOffset: {x: 0, y: 30, z: 0}
-  _characterControllerHeight: 0
-  _targetPosition: {x: 0, y: 0, z: 0}
   txtPlayerUsername: {fileID: 0}
+  playerSpeed: 3
+  jumpForce: 4
+  rotationSlerpSpeed: 124
+  playerReach: 3
+  heldItem: {fileID: 0}
 --- !u!114 &114698527043586634
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -375,6 +377,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 114019161044576486}
   - {fileID: 114650690372497238}
+  - {fileID: 0}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
@@ -431,12 +434,29 @@ CapsuleCollider:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1416093075307488}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1a75e0ef5882f22428e29ff41e1361c4, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!143 &143691065690980838
+CharacterController:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1416093075307488}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!222 &222848785144458798
 CanvasRenderer:

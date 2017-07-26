@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [AddComponentMenu("Camera Controllers/Better Mouse Orbit")]
 public class CameraController : MonoBehaviour
@@ -13,6 +16,8 @@ public class CameraController : MonoBehaviour
     };
 
     public Transform target;
+
+    private bool interactUI = false;
 
     public float distance = 10f;                    // The user's desired zoom distance (changes on scrollwheel)
     private float _curDistance;                     // The true camera distance
@@ -47,16 +52,41 @@ public class CameraController : MonoBehaviour
         _curOrientation = orientation;
     }
 
-    void LateUpdate()
-    {
-        if (target)
-        {
+    void Update() {
+    }
+
+    void LateUpdate() {
+
+        // Check if we are clicking on the UI
+        if (Input.GetMouseButton(0)) {
+            var pointer = new PointerEventData(EventSystem.current);
+            pointer.position = Input.mousePosition;
+
+            var hits = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(pointer, hits);
+
+            // Is the player interacting with the UI?
+            if (hits.Any(hitUI => hitUI.gameObject.name == "BTN - Disconnect")) {
+                Debug.Log("We are disconnecting");
+                interactUI = true;
+            // If not, update camera
+            } else {
+                UpdateCamera();
+            }
+        // Not interacting with UI, update camera
+        } else {
+            UpdateCamera();
+        }
+    }
+
+    public void UpdateCamera() {
+        if (target) {
             // determine distance
             float prevDistance = _curDistance;
 
             distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * zoomSpeed, distanceMin, distanceMax);
             _curDistance = Mathf.Lerp(_curDistance, distance, Time.deltaTime * zoomLerpSpeed);
-            
+
             // mouse button active?
             bool mouseButtonActive;
             if (panMouseButton == MouseButton.None) {
@@ -74,8 +104,7 @@ public class CameraController : MonoBehaviour
                 MousePointer.visible = !mouseButtonActive;
             }
 
-            if (mouseButtonActive)
-            {
+            if (mouseButtonActive) {
                 orientation += new Vector2(
                     Input.GetAxis("Mouse X") * panSpeed.x,
                     -Input.GetAxis("Mouse Y") * panSpeed.y) * Time.deltaTime;
@@ -84,17 +113,16 @@ public class CameraController : MonoBehaviour
             orientation.y = ClampAngle(orientation.y, orientationYMin, orientationYMax);
             _curOrientation.x = Mathf.LerpAngle(_curOrientation.x, orientation.x, Time.deltaTime * panLerpSpeed);
             _curOrientation.y = Mathf.LerpAngle(_curOrientation.y, orientation.y, Time.deltaTime * panLerpSpeed);
-            
+
             Quaternion rotation = Quaternion.Euler(_curOrientation.y, _curOrientation.x, 0);
             Vector3 ray = rotation * Vector3.back;
 
-            // camers clipping?
+            // camera clipping?
             RaycastHit hit;
-            if (Physics.SphereCast(target.position, minSurfaceDistance, ray, out hit, distance, raycastLayerMask))
-            {
+            if (Physics.SphereCast(target.position, minSurfaceDistance, ray, out hit, distance, raycastLayerMask)) {
                 _curDistance = Mathf.Lerp(prevDistance, hit.distance, Time.deltaTime * zoomLerpClipSpeed);
             }
-            
+
             //Debug.DrawRay(target.position, ray * distance, Color.red);
             //Debug.DrawRay(target.position, ray * _distance, Color.blue);
 

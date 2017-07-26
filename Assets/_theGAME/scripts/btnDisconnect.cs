@@ -12,6 +12,7 @@ public class btnDisconnect : MonoBehaviour {
 	}
 
     void LeaveRoom() {
+        Debug.Log("We are being clicked");
         networkManager.LeaveRoom();
     }
 }

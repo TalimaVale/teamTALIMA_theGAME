@@ -16,6 +16,9 @@
 - [x] Take Interact layer objects off of camera's clipping check
 - [ ] Fade out players who are close to camera
     - if a player has their camera zoomed close to another player's character, fade out that character
+- [ ] Restructure code so that majority of UI checks are not in CameraController script
+- [ ] Consider: Track MouseDown and MouseUp, so when we click down on UI and travel off of UI without releasing click, camera does not pan
+    - This will make for better user experience
 
 
 

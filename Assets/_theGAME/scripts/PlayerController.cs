@@ -8,6 +8,7 @@ public class PlayerController : PunBehaviour {
 
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject localPlayer;
+    public bool isLocalPlayer { get { return photonView.isMine; } }
 
     private int bawesomeness = 0;
 
@@ -15,7 +16,7 @@ public class PlayerController : PunBehaviour {
     Camera mainCamera;
     CameraController cameraController;
     public float fadeRate = 0.02f;
-
+    
     // Player UI
     public Transform playerCanvas;
     [Tooltip("The Player's UI GameObject Prefab")]
@@ -44,9 +45,9 @@ public class PlayerController : PunBehaviour {
         cameraController = mainCamera.GetComponent<CameraController>();
 
         // Is this the localPlayer
-        if (photonView.isMine) {
+        if (isLocalPlayer) {
             localPlayer = this.gameObject;
-            mainCamera.GetComponent<CameraController>().target = transform;
+            cameraController.target = transform;
         }
 
         rb = GetComponent<Rigidbody>();
@@ -57,10 +58,10 @@ public class PlayerController : PunBehaviour {
         playerCanvas = transform.Find("Player Canvas");
         txtPlayerUsername = GetComponentInChildren<Text>();
         txtPlayerUsername.text = photonView.owner.NickName;
-
+        
         hasItem = false;
 
-        if (photonView.isMine) {
+        if (isLocalPlayer) {
             GetComponent<MeshRenderer>().material.color = new Color(8 / 255f, 168 / 255f, 241 / 255f, 1);
             gameManager.txtBawesomeness.text = "Bawesomeness: " + bawesomeness;
         }
@@ -69,7 +70,7 @@ public class PlayerController : PunBehaviour {
     }
 
     void Update() {
-        if (!photonView.isMine) return;
+        if (!isLocalPlayer) return;
 
         // Player interaction
         hasItem = (heldItem == null) ? false : true;
@@ -141,12 +142,12 @@ public class PlayerController : PunBehaviour {
     }
 
     private void OnTriggerEnter(Collider other) {
-        if (!localPlayer) return;
+        if (!isLocalPlayer) return;
         if (other.CompareTag("Respawn Shield")) Respawn();
     }
 
     private void OnDestroy() {
-        if (photonView.isMine && heldItem != null) {
+        if (isLocalPlayer && heldItem != null) {
             RaycastHit hit;
             if (Physics.BoxCast(transform.position, new Vector3(.5f, .5f, .5f), Vector3.down, out hit, heldItem.transform.rotation, Mathf.Infinity, -1)) {
                 Debug.Log("hit.distance: " + hit.distance);
@@ -171,8 +172,8 @@ public class PlayerController : PunBehaviour {
 
     public void AddBawesomeness(int value, double cooldown = 0, double netTimestamp = 0) {
         Debug.Log("Calling AddBawesomeness");
-        if (!photonView.isMine) return;
-        Debug.Log("Calling AddBawesomeness, photonView.isMine");
+        if (!isLocalPlayer) return;
+        Debug.Log("Calling AddBawesomeness, isLocalPlayer");
 
         bawesomeness += value;
         gameManager.txtBawesomeness.text = "Bawesomeness: " + bawesomeness;
@@ -188,8 +189,8 @@ public class PlayerController : PunBehaviour {
     }
 
     public void Respawn() {
-        if (!localPlayer) return;
-        
+        if (!isLocalPlayer) return;
+
         // Default spawn point
         Vector3 spawnPoint = new Vector3(0, 3, 0);
 
@@ -204,13 +205,13 @@ public class PlayerController : PunBehaviour {
     }
 
     public void playerFade(float alphaValue) {
-        if (localPlayer) {
-            MeshRenderer[] renderers = localPlayer.GetComponentsInChildren<MeshRenderer>();
-            for (int i = 0; i < renderers.Length; i++) {
-                Color color = renderers[i].material.color;
-                color.a = Mathf.Clamp(color.a + alphaValue, 0, 1);
-                renderers[i].material.color = color;
-            }
+        if (!isLocalPlayer) return;
+
+        MeshRenderer[] renderers = localPlayer.GetComponentsInChildren<MeshRenderer>();
+        for (int i = 0; i < renderers.Length; i++) {
+            Color color = renderers[i].material.color;
+            color.a = Mathf.Clamp(color.a + alphaValue, 0, 1);
+            renderers[i].material.color = color;
         }
     }
 

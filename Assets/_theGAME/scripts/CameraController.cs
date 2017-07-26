@@ -17,8 +17,6 @@ public class CameraController : MonoBehaviour
 
     public Transform target;
 
-    private bool interactUI = false;
-
     public float distance = 10f;                    // The user's desired zoom distance (changes on scrollwheel)
     private float _curDistance;                     // The true camera distance
     public float curDistance
@@ -68,7 +66,6 @@ public class CameraController : MonoBehaviour
             // Is the player interacting with the UI?
             if (hits.Any(hitUI => hitUI.gameObject.name == "BTN - Disconnect")) {
                 Debug.Log("We are disconnecting");
-                interactUI = true;
             // If not, update camera
             } else {
                 UpdateCamera();

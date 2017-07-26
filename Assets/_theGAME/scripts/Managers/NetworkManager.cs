@@ -22,7 +22,7 @@ public class NetworkManager : PunBehaviour {
     [Tooltip("UI Text informing player the connection is in progress")]
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
 
-    string _gameVersion = "0.0.3";  // client version
+    string _gameVersion = "0.0.4";  // client version
     bool isConnecting;              // are we currently connecting
 
     private RoomOptions roomOptions;

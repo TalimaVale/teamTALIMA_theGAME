@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 114698527043586634}
   - component: {fileID: 114019161044576486}
   - component: {fileID: 114650690372497238}
+  - component: {fileID: 114965930464659220}
   m_Layer: 8
   m_Name: teamTALIMA Player
   m_TagString: Untagged
@@ -62,6 +63,7 @@ GameObject:
   - component: {fileID: 33831372376325754}
   - component: {fileID: 65333479824752920}
   - component: {fileID: 23145143255390266}
+  - component: {fileID: 114095373605477640}
   m_Layer: 8
   m_Name: Visor
   m_TagString: Untagged
@@ -93,7 +95,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1416093075307488}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4356724533618858}
@@ -300,6 +302,18 @@ MonoBehaviour:
     InterpolateOption: 0
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 0
+--- !u!114 &114095373605477640
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1533057662892516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17bbbd85cdbb666498be4b930b5b063c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderQueue: 3001
 --- !u!114 &114456115385333230
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -366,6 +380,18 @@ MonoBehaviour:
   instantiationId: -1
   currentMasterID: -1
   isRuntimeInstantiated: 0
+--- !u!114 &114965930464659220
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1416093075307488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17bbbd85cdbb666498be4b930b5b063c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderQueue: 3000
 --- !u!114 &114998741354410024
 MonoBehaviour:
   m_ObjectHideFlags: 1

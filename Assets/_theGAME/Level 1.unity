@@ -736,7 +736,7 @@ MonoBehaviour:
   minSurfaceDistance: 0.3
   raycastLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967039
+    m_Bits: 4294966527
 --- !u!1001 &1410136247
 Prefab:
   m_ObjectHideFlags: 0

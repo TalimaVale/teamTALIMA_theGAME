@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Photon;
 
-public class minigameBlockStackConsole : PunBehaviour {
+public class MinigameCollectConsole : PunBehaviour {
 
     [Tooltip("Prefab for minigame blocks")]
     public string block = "Minigame Block";
@@ -161,7 +161,7 @@ public class minigameBlockStackConsole : PunBehaviour {
         if (Colliders != null) {
             Debug.Log("Colliders is NOT null: " + Colliders.Count());
             foreach (Collider collider in Colliders) {
-                minigameBlock block = collider.GetComponent<minigameBlock>();
+                MinigameCollectBlock block = collider.GetComponent<MinigameCollectBlock>();
                 if (block != null) {
                     Debug.Log("The collider IS a minigameBlock");
                     if (!block.hasOwner) {
@@ -189,7 +189,7 @@ public class minigameBlockStackConsole : PunBehaviour {
         block.gameObject.layer = 0;
 
         // keep updated incase MasterClient changes
-        block.GetComponent<minigameBlock>().stacked = true;
+        block.GetComponent<MinigameCollectBlock>().stacked = true;
         stackPos = newStackPos;
         stackTotal = newStackTotal;
     }
@@ -331,22 +331,11 @@ public class minigameBlockStackConsole : PunBehaviour {
 // TODO: Create and implement a method for RPC's Debug.Log line.
 // TODO: Consider adding UI Text element for MinigameWinTimer. Visual countdown to reward
 
+    
+    
+// Fix Up Player Movement - remove physics, code realistic jump
+// Improve Visual Lag - hide coin upon collection, pick up/drop blocks instantly, reposition block upon 'stacking' drop
 
 
-// Develop system for 'reward' awesomeness
-// Players can only collect one coin of reward awesomeness within the first # of seconds of the reward spawning
-
-// All 'reward' awesomeness contains a collect timer of a # of seconds
-// When a player collects a 'reward' awesomeness coin, coin's collect timer is added to player as a 'reward' awesomeness collect cooldown
-// Once player's collect cooldown expires (reaches 0), player can collect more 'reward' awesomeness
-// If 'reward' awesomeness's collect timer is 0 when a player trys to collect it, no cooldown is added to the player
-
-// Consider adjusting archPoint so players right next to console cannot 'intercept' coins before they arch
-
-
-
-// After minigame, fix up player movement/physics/lag
-// Hide coin upon collection
-// Reposition block upon 'stacking' drop
 
 // Build Terrain (marching cubes)

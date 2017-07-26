@@ -460,7 +460,7 @@ MonoBehaviour:
   block: Minigame Block
   spawnPoints: []
   Blocks: []
-  particleShield: {fileID: 0}
+  particleShield: {fileID: 198717614339915614}
   blockCount: 7
   blockSpawnHeight: 2
   stackPadding: 0.6

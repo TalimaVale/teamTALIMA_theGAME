@@ -88,7 +88,7 @@ public class CameraController : MonoBehaviour
             Quaternion rotation = Quaternion.Euler(_curOrientation.y, _curOrientation.x, 0);
             Vector3 ray = rotation * Vector3.back;
 
-            // camers clipping?
+            // camera clipping?
             RaycastHit hit;
             if (Physics.SphereCast(target.position, minSurfaceDistance, ray, out hit, distance, raycastLayerMask))
             {

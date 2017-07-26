@@ -1,10 +1,9 @@
 using UnityEngine;
 using Photon;
 
-public class minigameBlock : PunBehaviour {
+public class MinigameCollectBlock : PunBehaviour {
 
-    public minigameBlockStackConsole console;
-
+    public MinigameCollectConsole console;
 
     // heldItem acceptable dropDistance
     public float dropDistance = 5.0f;
@@ -17,7 +16,7 @@ public class minigameBlock : PunBehaviour {
 
     void Awake() {
         gameObject.SetActive(false);
-        console = FindObjectOfType<minigameBlockStackConsole>();
+        console = FindObjectOfType<MinigameCollectConsole>();
         console.Blocks.Add(gameObject);
     }
 

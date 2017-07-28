@@ -336,8 +336,6 @@ public class MinigameCollectConsole : PunBehaviour {
 // TODO: Create and implement a method for RPC's Debug.Log line.
 // TODO: Consider adding UI Text element for MinigameWinTimer. Visual countdown to reward
 
-    
-    
-// Fix Up Player Movement - remove physics, code realistic jump
+
 
 // Build Terrain (marching cubes)

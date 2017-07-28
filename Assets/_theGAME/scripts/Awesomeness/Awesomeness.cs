@@ -22,11 +22,12 @@ public class Awesomeness : PunBehaviour {
 
     virtual public void CallAddBawesomeness(PlayerController player) {
         player.AddBawesomeness(value);
-        photonView.RPC("Collect", PhotonTargets.MasterClient, photonView.viewID);
+        gameObject.SetActive(false);
+        photonView.RPC("OnCollect", PhotonTargets.MasterClient, photonView.viewID);
     }
 
     [PunRPC]
-    void Collect(int viewID) {
+    void OnCollect(int viewID) {
         Debug.Log("Awesomeness Collect RPC");
         PhotonNetwork.Destroy(PhotonView.Find(viewID).gameObject);
     }

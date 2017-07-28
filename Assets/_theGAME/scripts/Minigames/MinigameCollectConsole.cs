@@ -23,8 +23,9 @@ public class MinigameCollectConsole : PunBehaviour {
     public int blockCount = 5;
     public float blockSpawnHeight = 2;
 
-    private float collectDis = 2.0f;
-    private Vector3 stackPos;
+    public float collectDis = 3.0f;
+    public LayerMask collectMask = -1;
+    public Vector3 stackPos;
     public float stackPadding = 0.6f;
     private int stackTotal = 0;
 
@@ -154,28 +155,32 @@ public class MinigameCollectConsole : PunBehaviour {
     }
 
     [PunRPC] // called to MasterClient
-    public void CollectBlocks() {
+    public void CollectBlocks(int blockViewID, Vector3 prevBlockPos, PhotonPlayer owner) {
         Debug.Log("<Color=Magenta>CollectBlocks()</Color> -- Calling CollectBlocks");
+        MinigameCollectBlock block = PhotonView.Find(blockViewID).GetComponent<MinigameCollectBlock>();
 
-        Collider[] Colliders = Physics.OverlapSphere(transform.position, collectDis);
-        if (Colliders != null) {
-            Debug.Log("Colliders is NOT null: " + Colliders.Count());
-            foreach (Collider collider in Colliders) {
-                MinigameCollectBlock block = collider.GetComponent<MinigameCollectBlock>();
-                if (block != null) {
-                    Debug.Log("The collider IS a minigameBlock");
-                    if (!block.hasOwner) {
-                        block.transform.position = stackPos + new Vector3(0, block.transform.localScale.y / 2, 0);
+        if (Physics.OverlapSphere(transform.position, collectDis, 1 << gameObject.layer).Any(collider => collider.GetComponent<PhotonView>().viewID == blockViewID)) {
+            Debug.Log("The collider IS our minigameBlock");
 
-                        stackPos += new Vector3(0, (block.transform.localScale.y + stackPadding), 0);
-                        stackTotal++;
-                        Debug.Log(stackTotal);
+            if (!block.hasOwner) {
+                block.transform.position = stackPos + new Vector3(0, block.transform.localScale.y / 2, 0);
 
-                        photonView.RPC("SetStackedBlockData", PhotonTargets.All, block.photonView.viewID, block.transform.position, stackPos, stackTotal);
-                    }
-                }
+                stackPos += new Vector3(0, (block.transform.localScale.y + stackPadding), 0);
+                stackTotal++;
+
+                photonView.RPC("SetStackedBlockData", PhotonTargets.All, blockViewID, block.transform.position, stackPos, stackTotal);
             }
+        } else {
+            Debug.Log("Block WAS NOT close enough");
+            photonView.RPC("ResetStackedBlockPos", owner, blockViewID, prevBlockPos);
         }
+    }
+
+    [PunRPC] // called on previous block owner to reset the block's position on their client (if they falsely stacked it)
+    void ResetStackedBlockPos(int blockViewID, Vector3 prevBlockPos) {
+        Debug.Log("RPC has reached correct PhotonPlayer");
+        GameObject block = PhotonView.Find(blockViewID).gameObject;
+        block.transform.position = prevBlockPos;
     }
 
     [PunRPC] // called to All
@@ -334,8 +339,5 @@ public class MinigameCollectConsole : PunBehaviour {
     
     
 // Fix Up Player Movement - remove physics, code realistic jump
-// Improve Visual Lag - hide coin upon collection, pick up/drop blocks instantly, reposition block upon 'stacking' drop
-
-
 
 // Build Terrain (marching cubes)

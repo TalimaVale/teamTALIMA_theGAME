@@ -463,6 +463,11 @@ MonoBehaviour:
   particleShield: {fileID: 198717614339915614}
   blockCount: 7
   blockSpawnHeight: 2
+  collectDis: 3
+  collectMask:
+    serializedVersion: 2
+    m_Bits: 4294966984
+  stackPos: {x: 0, y: 0, z: 0}
   stackPadding: 0.6
   winTotal: 3
   archPoint: {x: 0, y: 0, z: 0}

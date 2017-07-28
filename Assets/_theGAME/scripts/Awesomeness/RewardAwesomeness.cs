@@ -53,11 +53,13 @@ public class RewardAwesomeness : Awesomeness {
             if (collectCountdown == 0) {
                 Debug.Log("Coin countdown is AT ZERO");
                 player.AddBawesomeness(value, PhotonNetwork.time);
-                photonView.RPC("Collect", PhotonTargets.MasterClient, photonView.viewID);
+                gameObject.SetActive(false);
+                photonView.RPC("OnCollect", PhotonTargets.MasterClient, photonView.viewID);
             } else {
                 Debug.Log("Coin is still COUNTING DOWN");
                 player.AddBawesomeness(value, collectCountdown, PhotonNetwork.time);
-                photonView.RPC("Collect", PhotonTargets.MasterClient, photonView.viewID);
+                gameObject.SetActive(false);
+                photonView.RPC("OnCollect", PhotonTargets.MasterClient, photonView.viewID);
             }
         } else {
             Debug.Log("We are on cooldown for collecting Reward Awesomeness");
@@ -65,7 +67,7 @@ public class RewardAwesomeness : Awesomeness {
     }
 
     [PunRPC]
-    void Collect(int viewID) {
+    void OnCollect(int viewID) {
         Debug.Log("REWARDAwesomeness Collect RPC");
         PhotonNetwork.Destroy(PhotonView.Find(viewID).gameObject);
     }

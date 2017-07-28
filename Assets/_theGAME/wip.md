@@ -1,4 +1,4 @@
-﻿# Work In Progress
+# Work In Progress
 
 ### Scene - Level 1
 - [ ] Upgrade UI typography, to be sharp and clear
@@ -8,6 +8,7 @@
 
 ### PlayerController.cs
 - [ ] Comment current code
+- [ ] Create universal canvas for all player usernames
 
 
 

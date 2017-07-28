@@ -72,4 +72,6 @@ MonoBehaviour:
   - CoinArch
   - MinigameWinTimer
   - ParticleShieldWin
+  - ResetStackedBlockPos
+  - OnCollect
   DisableAutoOpenWizard: 1

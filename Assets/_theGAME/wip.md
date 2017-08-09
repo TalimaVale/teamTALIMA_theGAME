@@ -1,15 +1,21 @@
 # Work In Progress
 
+PRIORITIES:
+// Implement GUIManager
+
+// Build Terrain (self-build: marching cubes, voxels) (asset store: Voxeland $95)
+
+
+
 ### Scene - Level 1
-- [ ] Upgrade UI typography, to be sharp and clear
+- [x] Upgrade UI typography, to be sharp and clear
     - In Unity, fonts will be sharper if set to a large font size and scaled down using the Transform component
 
 
 
 ### PlayerController.cs
 - [ ] Comment current code
-- [ ] Create universal canvas for all player usernames
-
+- [ ] localPlayer should not see their own username
 
 
 ### CameraController.cs

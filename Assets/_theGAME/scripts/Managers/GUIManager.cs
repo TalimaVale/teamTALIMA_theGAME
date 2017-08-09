@@ -14,8 +14,7 @@ public class GUIManager : MonoBehaviour {
     }
 }
 
-// Move CameraController GUI checks here
-// Combine Player Prefabs' username canvases into one (controlled here)
-// Move/Check Disconnect btn
-// Move/Check Bawesomeness text
 // Make singleton
+// Move CameraController GUI checks here
+// Move/Check Disconnect btn code
+// Move/Check Bawesomeness text code

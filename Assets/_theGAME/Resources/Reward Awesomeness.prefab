@@ -25,7 +25,7 @@ GameObject:
   - component: {fileID: 135893957265836848}
   - component: {fileID: 95606006811436974}
   - component: {fileID: 114544974223249034}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Reward Awesomeness
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,6 +112,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0dfbe68ea4f0fbb489a14bf7fbb1b731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  value: 1
+  archSpeed: 7
+  cooldown: 10
 --- !u!114 &114636528422175984
 MonoBehaviour:
   m_ObjectHideFlags: 1

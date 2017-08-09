@@ -11,7 +11,6 @@ Material:
   m_ShaderKeywords: _ALPHABLEND_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
   stringTagMap:
     RenderType: Transparent
@@ -115,7 +114,7 @@ Material:
     - _SquashAmount: 1
     - _SrcBlend: 5
     - _UVSec: 0
-    - _ZWrite: 1
+    - _ZWrite: 0
     m_Colors:
     - _Color: {r: 0.03137255, g: 0.65882355, b: 0.94509804, a: 1}
     - _Emission: {r: 0, g: 0, b: 0, a: 0}

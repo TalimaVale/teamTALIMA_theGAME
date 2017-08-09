@@ -160,8 +160,8 @@ public class MinigameCollectConsole : PunBehaviour {
         MinigameCollectBlock block = PhotonView.Find(blockViewID).GetComponent<MinigameCollectBlock>();
 
         if (Physics.OverlapSphere(transform.position, collectDis, 1 << gameObject.layer).Any(collider => collider.GetComponent<PhotonView>().viewID == blockViewID)) {
-            Debug.Log("The collider IS our minigameBlock");
-
+            Debug.Log("The collider IS close enough");
+            
             if (!block.hasOwner) {
                 block.transform.position = stackPos + new Vector3(0, block.transform.localScale.y / 2, 0);
 
@@ -335,7 +335,3 @@ public class MinigameCollectConsole : PunBehaviour {
 // TODO: spawnPoints array isUse boolean not synced. Consider -- InstantiateBlock an RPC and sync inUse to PT.All and OnPhotonPlayerConnect
 // TODO: Create and implement a method for RPC's Debug.Log line.
 // TODO: Consider adding UI Text element for MinigameWinTimer. Visual countdown to reward
-
-
-
-// Build Terrain (self-build: marching cubes, voxels) (asset store: Voxeland $95)

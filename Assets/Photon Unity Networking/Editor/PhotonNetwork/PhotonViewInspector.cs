@@ -14,9 +14,11 @@
 
 
 using System;
-using Rotorz.ReorderableList.Internal;
 using UnityEditor;
 using UnityEngine;
+
+using Photon.Pun;
+
 
 [CustomEditor(typeof (PhotonView))]
 public class PhotonViewInspector : Editor

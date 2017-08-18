@@ -4,7 +4,7 @@ using Photon;
 
 public class PlayerController : PunBehaviour {
 
-    GameManager gameManager;
+    TTGameManager gameManager;
 
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject localPlayer;
@@ -39,10 +39,12 @@ public class PlayerController : PunBehaviour {
     private double cdInitTime;
 
     void Awake() {
-        gameManager = FindObjectOfType<GameManager>();
+        gameManager = FindObjectOfType<TTGameManager>();
 
         mainCamera = Camera.main;
         cameraController = mainCamera.GetComponent<CameraController>();
+        
+        rb = GetComponent<Rigidbody>();
 
         // Is this the localPlayer
         if (isLocalPlayer) {
@@ -50,23 +52,26 @@ public class PlayerController : PunBehaviour {
             cameraController.target = transform;
         }
 
-        rb = GetComponent<Rigidbody>();
+        Debug.Log("My starting position: " + transform.position);
     }
 
     // Use this for initialization
     void Start() {
         playerCanvas = transform.Find("Player Canvas");
         txtPlayerUsername = GetComponentInChildren<Text>();
-        txtPlayerUsername.text = photonView.owner.NickName;
+
+        txtPlayerUsername.text = photonView.owner.NickName; // PhotonNetwork.player.NickName;
         
         hasItem = false;
 
+        // Is this the localPlayer
         if (isLocalPlayer) {
             GetComponent<MeshRenderer>().material.color = new Color(8 / 255f, 168 / 255f, 241 / 255f, 1);
             gameManager.txtBawesomeness.text = "Bawesomeness: " + bawesomeness;
         }
 
         Debug.Log("Our current bawesomeness: " + bawesomeness);
+        Debug.Log("My starting position: " + transform.position);
     }
 
     void Update() {

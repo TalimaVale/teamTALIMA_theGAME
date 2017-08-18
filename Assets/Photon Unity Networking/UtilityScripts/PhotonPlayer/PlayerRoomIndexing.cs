@@ -85,6 +85,12 @@ namespace ExitGames.UtilityScripts
 				Debug.LogError("Existing instance of PlayerRoomIndexing found. Only One instance is required at the most. Please correct and have only one at any time.");
 			}
 			instance = this;
+
+			// check if we are already in room, likely if component was added at runtime or came late into scene
+			if (PhotonNetwork.room!=null)
+			{
+				SanitizeIndexing(true);
+			}
 		}
 
 		#endregion
@@ -158,9 +164,9 @@ namespace ExitGames.UtilityScripts
 		/// <summary>
 		/// Sanitizes the indexing incase a player join while masterclient was changed and missed it.
 		/// </summary>
-		void SanitizeIndexing()
+		void SanitizeIndexing(bool forceIndexing = false)
 		{
-			if (!PhotonNetwork.isMasterClient)
+			if (!forceIndexing && !PhotonNetwork.isMasterClient)
 			{
 				return;
 			}

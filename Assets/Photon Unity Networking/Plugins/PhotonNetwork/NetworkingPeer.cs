@@ -239,7 +239,11 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
     public bool IsUsingNameServer { get; protected internal set; }
 
     /// <summary>Name Server Host Name for Photon Cloud. Without port and without any prefix.</summary>
+    #if !UNITY_EDITOR && UNITY_SWITCH
+    public const string NameServerHost = "nameserver-eu.cloudapp.net";//set to "ns.exitgames.com" after Nintendo has fixed the traffic manager bug in their dns-resolver for which this is a workaround
+    #else
     public const string NameServerHost = "ns.exitgames.com";
+    #endif
 
     /// <summary>Name Server for HTTP connections to the Photon Cloud. Includes prefix and port.</summary>
     public const string NameServerHttp = "http://ns.exitgamescloud.com:80/photon/n";
@@ -340,16 +344,16 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
 
     public PhotonPlayer LocalPlayer { get; internal set; }
 
-    /// <summary>Stat value: Count of players on Master (looking for rooms)</summary>
+    /// <summary>Statistic value available on master server: Players on master (looking for games).</summary>
     public int PlayersOnMasterCount { get; internal set; }
 
-    /// <summary>Stat value: Count of Players in rooms</summary>
+    /// <summary>Statistic value available on master server: Players in rooms (playing).</summary>
     public int PlayersInRoomsCount { get; internal set; }
 
-    /// <summary>Stat value: Count of Rooms</summary>
+    /// <summary>Statistic value available on master server: Rooms currently created.</summary>
     public int RoomsCount { get; internal set; }
 
-
+    /// <summary>Internally used to decide if a room must be created or joined on game server.</summary>
     private JoinType lastJoinType;
 
     protected internal EnterRoomParams enterRoomParamsCache;
@@ -415,9 +419,9 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
 
     public bool hasSwitchedMC = false;
 
-    private HashSet<int> allowedReceivingGroups = new HashSet<int>();
+    private HashSet<byte> allowedReceivingGroups = new HashSet<byte>();
 
-    private HashSet<int> blockSendingGroups = new HashSet<int>();
+    private HashSet<byte> blockSendingGroups = new HashSet<byte>();
 
     protected internal Dictionary<int, PhotonView> photonViewList = new Dictionary<int, PhotonView>(); //TODO: make private again
 
@@ -446,6 +450,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
 
     /// <summary>Caches PhotonNetworkingMessage.OnPhotonInstantiate.ToString(), because DoInstantiate calls it often (and ToString() on the enum is astonishingly expensive).</summary>
     private static readonly string OnPhotonInstantiateString = PhotonNetworkingMessage.OnPhotonInstantiate.ToString();
+
 
     // TODO: CAS must be implemented for OfflineMode
 
@@ -589,7 +594,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
 
 
     /// <summary>
-    /// Connects to the NameServer for Photon Cloud, where a region and server list can be obtained.
+    /// Connects to the NameServer for Photon Cloud, where a region-list can be fetched.
     /// </summary>
     /// <see cref="OpGetRegions"/>
     /// <returns>If the workflow was started or failed right away.</returns>
@@ -631,7 +636,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
             return false;
         }
 
-        IsUsingNameServer = true;
+        this.IsUsingNameServer = true;
         this.CloudRegion = region;
 
         if (this.State == ClientState.ConnectedToNameServer)
@@ -649,9 +654,37 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
         return true;
     }
 
+    // this sets up the protocol to us, depending on auth-mode and or export.
     protected internal void SetupProtocol(ServerConnection serverType)
     {
         ConnectionProtocol protocolOverride = this.TransportProtocol;
+
+        #if UNITY_XBOXONE
+        if (this.AuthMode != AuthModeOption.AuthOnceWss)
+        {
+            UnityEngine.Debug.LogWarning("UNITY_XBOXONE builds must use AuthMode \"AuthOnceWss\". The default setting was changed. Resetting it now.");
+        }
+        if (this.EncryptionMode != EncryptionMode.DatagramEncryption)
+        {
+            UnityEngine.Debug.LogWarning("UNITY_XBOXONE builds must use EncryptionMode \"DatagramEncryption\". The default setting was changed. Resetting it now.");
+        }
+        if (this.AuthValues == null || this.AuthValues.AuthType != CustomAuthenticationType.Xbox)
+        {
+            UnityEngine.Debug.LogError("UNITY_XBOXONE builds must use AuthValues.AuthType \"CustomAuthenticationType.XboxCheck\". Set this before calling any Connect method.");
+            if (this.AuthValues == null)
+            {
+                this.AuthValues = new AuthenticationValues();
+            }
+            this.AuthValues.AuthType = CustomAuthenticationType.Xbox;
+        }
+        if (!PhotonPeer.NativeDatagramEncrypt)
+        {
+            throw new NotSupportedException("UNITY_XBOXONE builds have to use a special Photon library with Native Datagram Encryption. This is missing. Check your build setup!");
+        }
+
+        this.AuthMode = AuthModeOption.AuthOnceWss;
+        this.EncryptionMode = EncryptionMode.DatagramEncryption;
+        #endif
 
         if (this.AuthMode == AuthModeOption.AuthOnceWss)
         {
@@ -719,7 +752,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
             #if !UNITY_EDITOR && (UNITY_PS3 || UNITY_ANDROID)
             this.SocketImplementationConfig[ConnectionProtocol.Udp] = typeof(SocketUdpNativeDynamic);
             PhotonHandler.PingImplementation = typeof(PingNativeDynamic);
-            #elif !UNITY_EDITOR && UNITY_IPHONE
+            #elif !UNITY_EDITOR && (UNITY_IPHONE || UNITY_SWITCH)
             this.SocketImplementationConfig[ConnectionProtocol.Udp] = typeof(SocketUdpNativeStatic);
             PhotonHandler.PingImplementation = typeof(PingNativeStatic);
             #elif !UNITY_EDITOR && UNITY_WINRT
@@ -1020,12 +1053,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
     {
         if (this.LocalPlayer == null)
         {
-            Debug.LogWarning(
-                string.Format(
-                    "LocalPlayer is null or not in mActors! LocalPlayer: {0} mActors==null: {1} newID: {2}",
-                    this.LocalPlayer,
-                    this.mActors == null,
-                    newID));
+            Debug.LogWarning(string.Format("LocalPlayer is null or not in mActors! LocalPlayer: {0} mActors==null: {1} newID: {2}",this.LocalPlayer,this.mActors == null,newID));
         }
 
         if (this.mActors.ContainsKey(this.LocalPlayer.ID))
@@ -1068,8 +1096,8 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
         this.mActors = new Dictionary<int, PhotonPlayer>();
         this.mPlayerListCopy = new PhotonPlayer[0];
         this.mOtherPlayerListCopy = new PhotonPlayer[0];
-        this.allowedReceivingGroups = new HashSet<int>();
-        this.blockSendingGroups = new HashSet<int>();
+        this.allowedReceivingGroups = new HashSet<byte>();
+        this.blockSendingGroups = new HashSet<byte>();
         this.mGameList = new Dictionary<string, RoomInfo>();
         this.mGameListCopy = new RoomInfo[0];
         this.isFetchingFriendList = false;
@@ -1742,14 +1770,17 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                     bool enabledRegion = true;
                     if (PhotonNetwork.PhotonServerSettings.HostType == ServerSettings.HostingOption.BestRegion && PhotonNetwork.PhotonServerSettings.EnabledRegions != 0)
                     {
-                        CloudRegionFlag flag = Region.ParseFlag(regionCodeString);
+                        CloudRegionFlag flag = Region.ParseFlag(code);
                         enabledRegion = ((PhotonNetwork.PhotonServerSettings.EnabledRegions & flag) != 0);
                         if (!enabledRegion && PhotonNetwork.logLevel >= PhotonLogLevel.Informational)
                         {
                             Debug.Log("Skipping region because it's not in PhotonServerSettings.EnabledRegions: " + code);
                         }
                     }
-                    if (enabledRegion) this.AvailableRegions.Add(new Region() { Code = code, HostAndPort = servers[i] });
+                    if (enabledRegion)
+                    {
+                        this.AvailableRegions.Add(new Region(code, regionCodeString, servers[i]));
+                    }
                 }
 
                 // PUN assumes you fetch the name-server's list of regions to ping them
@@ -1936,15 +1967,6 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                 SendMonoMessage(PhotonNetworkingMessage.OnWebRpcResponse, operationResponse);
                 break;
 
-            #region Custom Operation Responses
-
-            // "HelloWorld" operation code = 190
-            case OperationCode.HelloWorld:
-                CustomOperations.OpHelloWorldResponse(operationResponse);
-                break;
-
-            #endregion
-
             default:
                 Debug.LogWarning(string.Format("OperationResponse unhandled: {0}", operationResponse.ToString()));
                 break;
@@ -2055,7 +2077,6 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                 break;
 
             case StatusCode.Disconnect:
-
                 this.didAuthenticate = false;
                 this.isFetchingFriendList = false;
                 if (this.Server == ServerConnection.GameServer) this.LeftRoomCleanup();
@@ -2080,16 +2101,20 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                 {
                     if (this.AuthValues != null)
                     {
-                        this.AuthValues.Token = null;  // invalidate any custom auth secrets
+                        this.AuthValues.Token = null;       // invalidate any custom auth secrets
                     }
 
-                    this.State = ClientState.PeerCreated; // if we set another state here, we could keep clients from connecting in OnDisconnectedFromPhoton right here.
+                    this.IsInitialConnect = false;          // not "connecting" anymore
+                    this.State = ClientState.PeerCreated;   // if we set another state here, we could keep clients from connecting in OnDisconnectedFromPhoton right here.
                     SendMonoMessage(PhotonNetworkingMessage.OnDisconnectedFromPhoton);
                 }
                 break;
 
-            case StatusCode.SecurityExceptionOnConnect:
             case StatusCode.ExceptionOnConnect:
+            case StatusCode.SecurityExceptionOnConnect:
+
+				this.IsInitialConnect = false;
+
                 this.State = ClientState.PeerCreated;
                 if (this.AuthValues != null)
                 {
@@ -2115,6 +2140,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
 
                     this.State = ClientState.PeerCreated;
                     cause = (DisconnectCause)statusCode;
+					this.IsInitialConnect = false;
                     SendMonoMessage(PhotonNetworkingMessage.OnFailedToConnectToPhoton, cause);
                 }
                 else
@@ -2133,6 +2159,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                 {
                     Debug.LogWarning(statusCode + " while connecting to: " + this.ServerAddress + ". Check if the server is available.");
 
+					this.IsInitialConnect = false;
                     cause = (DisconnectCause)statusCode;
                     SendMonoMessage(PhotonNetworkingMessage.OnFailedToConnectToPhoton, cause);
                 }
@@ -2168,6 +2195,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                 {
                     Debug.LogWarning(statusCode + " while connecting to: " + this.ServerAddress + ". Check if the server is available.");
 
+					this.IsInitialConnect = false;
                     cause = (DisconnectCause)statusCode;
                     SendMonoMessage(PhotonNetworkingMessage.OnFailedToConnectToPhoton, cause);
                 }
@@ -2188,17 +2216,17 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                 // this.mListener.clientErrorReturn(statusCode);
                 break;
 
-            case StatusCode.QueueOutgoingReliableWarning:
-            case StatusCode.QueueOutgoingUnreliableWarning:
-            case StatusCode.QueueOutgoingAcksWarning:
-            case StatusCode.QueueSentWarning:
-                // this.mListener.warningReturn(statusCode);
-                break;
+            //case StatusCode.QueueOutgoingReliableWarning:
+            //case StatusCode.QueueOutgoingUnreliableWarning:
+            //case StatusCode.QueueOutgoingAcksWarning:
+            //case StatusCode.QueueSentWarning:
+            //    // this.mListener.warningReturn(statusCode);
+            //    break;
 
-            case StatusCode.QueueIncomingReliableWarning:
-            case StatusCode.QueueIncomingUnreliableWarning:
-                Debug.Log(statusCode + ". This client buffers many incoming messages. This is OK temporarily. With lots of these warnings, check if you send too much or execute messages too slow. " + (PhotonNetwork.isMessageQueueRunning? "":"Your isMessageQueueRunning is false. This can cause the issue temporarily.") );
-                break;
+            //case StatusCode.QueueIncomingReliableWarning:
+            //case StatusCode.QueueIncomingUnreliableWarning:
+            //    Debug.Log(statusCode + ". This client buffers many incoming messages. This is OK temporarily. With lots of these warnings, check if you send too much or execute messages too slow. " + (PhotonNetwork.isMessageQueueRunning? "":"Your isMessageQueueRunning is false. This can cause the issue temporarily.") );
+            //    break;
 
                 // // TCP "routing" is an option of Photon that's not currently needed (or supported) by PUN
                 //case StatusCode.TcpRouterResponseOk:
@@ -2366,10 +2394,6 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
                     SendMonoMessage(PhotonNetworkingMessage.OnReceivedRoomListUpdate);
                     break;
                 }
-
-            case EventCode.QueueState:
-                // not used anymore
-                break;
 
             case EventCode.AppStats:
                 // Debug.LogInfo("Received stats!");
@@ -2972,7 +2996,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
         return true;
     }
 
-    internal Hashtable SendInstantiate(string prefabName, Vector3 position, Quaternion rotation, int group, int[] viewIDs, object[] data, bool isGlobalObject)
+    internal Hashtable SendInstantiate(string prefabName, Vector3 position, Quaternion rotation, byte group, int[] viewIDs, object[] data, bool isGlobalObject)
     {
         // first viewID is now also the gameobject's instantiateId
         int instantiateId = viewIDs[0];   // LIMITS PHOTONVIEWS&PLAYERS
@@ -3046,10 +3070,10 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
             rotation = (Quaternion)evData[(byte)2];
         }
 
-        int group = 0;
+        byte group = 0;
         if (evData.ContainsKey((byte)3))
         {
-            group = (int)evData[(byte)3];
+            group = (byte)evData[(byte)3];
         }
 
         short objLevelPrefix = 0;
@@ -3741,86 +3765,67 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
         }
     }
 
-    // SetReceiving
-    public void SetReceivingEnabled(int group, bool enabled)
-    {
-        if (group <= 0)
-        {
-            Debug.LogError("Error: PhotonNetwork.SetReceivingEnabled was called with an illegal group number: " + group + ". The group number should be at least 1.");
-            return;
-        }
 
-        if (enabled)
+    public void SetInterestGroups(byte[] disableGroups, byte[] enableGroups)
+    {
+        if (disableGroups != null)
         {
-            if (!this.allowedReceivingGroups.Contains(group))
+            if (disableGroups.Length == 0)
             {
-                this.allowedReceivingGroups.Add(group);
-                byte[] groups = new byte[1] { (byte)group };
-                this.OpChangeGroups(null, groups);
+                // a byte[0] should disable ALL groups in one step and before any groups are enabled. we do this locally, too.
+                this.allowedReceivingGroups.Clear();
+            }
+            else
+            {
+                for (int index = 0; index < disableGroups.Length; index++)
+                {
+                    byte g = disableGroups[index];
+                    if (g <= 0)
+                    {
+                        Debug.LogError("Error: PhotonNetwork.SetInterestGroups was called with an illegal group number: " + g + ". The group number should be at least 1.");
+                        continue;
+                    }
+
+                    if (this.allowedReceivingGroups.Contains(g))
+                    {
+                        this.allowedReceivingGroups.Remove(g);
+                    }
+                }
             }
         }
-        else
-        {
-            if (this.allowedReceivingGroups.Contains(group))
-            {
-                this.allowedReceivingGroups.Remove(group);
-                byte[] groups = new byte[1] { (byte)group };
-                this.OpChangeGroups(groups, null);
-            }
-        }
-    }
-
-
-    public void SetReceivingEnabled(int[] enableGroups, int[] disableGroups)
-    {
-        List<byte> enableList = new List<byte>();
-        List<byte> disableList = new List<byte>();
 
         if (enableGroups != null)
         {
-            for (int index = 0; index < enableGroups.Length; index++)
+            if (enableGroups.Length == 0)
             {
-                int i = enableGroups[index];
-                if (i <= 0)
+                // a byte[0] should enable ALL groups in one step. we do this locally, too.
+                for (byte index = 0; index <= byte.MaxValue; index++)
                 {
-                    Debug.LogError("Error: PhotonNetwork.SetReceivingEnabled was called with an illegal group number: " + i + ". The group number should be at least 1.");
-                    continue;
-                }
-                if (!this.allowedReceivingGroups.Contains(i))
-                {
-                    this.allowedReceivingGroups.Add(i);
-                    enableList.Add((byte)i);
+                    this.allowedReceivingGroups.Add(index);
                 }
             }
-        }
-        if (disableGroups != null)
-        {
-            for (int index = 0; index < disableGroups.Length; index++)
+            else
             {
-                int i = disableGroups[index];
-                if (i <= 0)
+                for (int index = 0; index < enableGroups.Length; index++)
                 {
-                    Debug.LogError("Error: PhotonNetwork.SetReceivingEnabled was called with an illegal group number: " + i + ". The group number should be at least 1.");
-                    continue;
-                }
-                if (enableList.Contains((byte)i))
-                {
-                    Debug.LogError("Error: PhotonNetwork.SetReceivingEnabled disableGroups contains a group that is also in the enableGroups: " + i + ".");
-                    continue;
-                }
-                if (this.allowedReceivingGroups.Contains(i))
-                {
-                    this.allowedReceivingGroups.Remove(i);
-                    disableList.Add((byte)i);
+                    byte g = enableGroups[index];
+                    if (g <= 0)
+                    {
+                        Debug.LogError("Error: PhotonNetwork.SetInterestGroups was called with an illegal group number: " + g + ". The group number should be at least 1.");
+                        continue;
+                    }
+
+                    this.allowedReceivingGroups.Add(g);
                 }
             }
         }
 
-        this.OpChangeGroups(disableList.Count > 0 ? disableList.ToArray() : null, enableList.Count > 0 ? enableList.ToArray() : null); //Passing a 0 sized array != passing null
+        this.OpChangeGroups(disableGroups, enableGroups);
     }
 
+
     // SetSending
-    public void SetSendingEnabled(int group, bool enabled)
+    public void SetSendingEnabled(byte group, bool enabled)
     {
         if (!enabled)
         {
@@ -3833,18 +3838,23 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
     }
 
 
-    public void SetSendingEnabled(int[] enableGroups, int[] disableGroups)
+    public void SetSendingEnabled(byte[] disableGroups, byte[] enableGroups)
     {
-        if(enableGroups!=null){
-            foreach(int i in enableGroups){
-                if(this.blockSendingGroups.Contains(i))
-                    this.blockSendingGroups.Remove(i);
+        if (disableGroups != null)
+        {
+            for (int index = 0; index < disableGroups.Length; index++)
+            {
+                byte g = disableGroups[index];
+                this.blockSendingGroups.Add(g);
             }
         }
-        if(disableGroups!=null){
-            foreach(int i in disableGroups){
-                if(!this.blockSendingGroups.Contains(i))
-                    this.blockSendingGroups.Add(i);
+
+        if (enableGroups != null)
+        {
+            for (int index = 0; index < enableGroups.Length; index++)
+            {
+                byte g = enableGroups[index];
+                this.blockSendingGroups.Remove(g);
             }
         }
     }
@@ -3890,6 +3900,9 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
     /// </remarks>
     public static int ObjectsInOneUpdate = 10;
 
+	// cache the RaiseEventOptions to prevent redundant Memory Allocation
+	RaiseEventOptions options = new RaiseEventOptions();
+
     // this is called by Update() and in Unity that means it's single threaded.
     public void RunViewUpdate()
     {
@@ -3922,14 +3935,17 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
 
 
         // we got updates to send. every group is send it's own message and unreliable and reliable are split as well
-        RaiseEventOptions options = new RaiseEventOptions();
+		options.InterestGroup = 0;
+
         #if PHOTON_DEVELOP
         options.Receivers = ReceiverGroup.All;
         #endif
 
-
-        foreach (PhotonView view in this.photonViewList.Values)
+		var enumerator = this.photonViewList.GetEnumerator();   // replacing foreach (PhotonView view in this.photonViewList.Values) for memory allocation improvement
+        while (enumerator.MoveNext())
         {
+            PhotonView view = enumerator.Current.Value;
+
             // a client only sends updates for active, synchronized PhotonViews that are under it's control (isMine)
             if (view.synchronization == ViewSynchronization.Off || view.isMine == false || view.gameObject.activeInHierarchy == false)
             {
@@ -4071,27 +4087,30 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
         // each view creates a list of values that should be sent
         PhotonMessageInfo info = new PhotonMessageInfo(this.LocalPlayer, PhotonNetwork.ServerTimestamp, view);
         this.pStream.ResetWriteStream();
-        this.pStream.SendNext((int)view.viewID);
-        this.pStream.SendNext(false);
+        this.pStream.SendNext(null);
+        this.pStream.SendNext(null);
         this.pStream.SendNext(null);
         view.SerializeView(this.pStream, info);
-
 
         // check if there are actual values to be sent (after the "header" of viewId, (bool)compressed and (int[])nullValues)
         if (this.pStream.Count <= SyncFirstValue)
         {
             return null;
         }
+
+
+        object[] currentValues = this.pStream.ToArray();
+        currentValues[0] = view.viewID;
+        currentValues[1] = false;
+        currentValues[2] = null;
+
         if (view.synchronization == ViewSynchronization.Unreliable)
         {
-            return this.pStream.ToArray();
+            return currentValues;
         }
 
 
         // ViewSynchronization: Off, Unreliable, UnreliableOnChange, ReliableDeltaCompressed
-
-
-        object[] currentValues = this.pStream.ToArray();
         if (view.synchronization == ViewSynchronization.UnreliableOnChange)
         {
             if (AlmostEquals(currentValues, view.lastOnSerializeDataSent))

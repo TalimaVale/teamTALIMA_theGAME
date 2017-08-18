@@ -96,7 +96,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1416093075307488}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4356724533618858}
@@ -347,7 +347,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Username
+  m_Text: Username12!
 --- !u!114 &114456115385333230
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -381,8 +381,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeRate: 0.02
-  playerCanvas: {fileID: 0}
-  txtPlayerUsername: {fileID: 0}
+  playerCanvas: {fileID: 224565140073673666}
+  txtPlayerUsername: {fileID: 114289624029258714}
   playerSpeed: 3
   jumpForce: 4
   rotationSlerpSpeed: 124

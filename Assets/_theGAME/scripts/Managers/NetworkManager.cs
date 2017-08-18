@@ -17,7 +17,7 @@ using Photon;
 public class NetworkManager : PunBehaviour {
 
     static public NetworkManager instance = null;
-    GameManager gameManager;
+    TTGameManager gameManager;
     
     [Tooltip("UI Text informing player the connection is in progress")]
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
@@ -27,7 +27,7 @@ public class NetworkManager : PunBehaviour {
 
     private RoomOptions roomOptions;
 
-    private readonly string RoomName = "talTESTING Level 1";
+    private readonly string RoomName = "talTESTTT Level 1";
 
     void Awake() {
         // Check if instance already exists, if not set instance to 'this', if instance is not 'this' destory 'this'

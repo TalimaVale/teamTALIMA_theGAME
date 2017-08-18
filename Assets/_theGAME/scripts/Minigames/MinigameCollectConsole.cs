@@ -101,7 +101,7 @@ public class MinigameCollectConsole : PunBehaviour {
             } else spawnPoint = new Vector3(Random.Range(-5.0f, 5.0f), transform.position.y, Random.Range(-5.0f, 5.0f));
         } else spawnPoint = new Vector3(Random.Range(-5.0f, 5.0f), transform.position.y, Random.Range(-5.0f, 5.0f));
 
-        photonView.RPC("InstantiateBlockInScene", PhotonTargets.MasterClient, block, spawnPoint, Quaternion.identity, 0, null);
+        photonView.RPC("InstantiateBlockInScene", PhotonTargets.MasterClient, block, spawnPoint, Quaternion.identity, (byte)0, null);
     }
 
 
@@ -139,7 +139,7 @@ public class MinigameCollectConsole : PunBehaviour {
     }
 
     [PunRPC] // called to MasterClient
-    public void InstantiateBlockInScene(string PrefabName, Vector3 Position, Quaternion Rotation, int Group, object[] Data) {
+    public void InstantiateBlockInScene(string PrefabName, Vector3 Position, Quaternion Rotation, byte Group, object[] Data) {
         Debug.Log("<Color=Magenta>InstantiateBlockInScene()</Color> -- Calling InstantiateBlockInScene");
 
         GameObject block = PhotonNetwork.InstantiateSceneObject(PrefabName, Position, Rotation, Group, Data);

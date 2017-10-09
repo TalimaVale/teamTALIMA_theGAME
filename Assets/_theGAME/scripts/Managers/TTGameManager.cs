@@ -34,10 +34,10 @@ public class TTGameManager : PunBehaviour {
         if (playerPrefab == null) {
             Debug.LogError("<Color=Red>Missing</Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'");
         } else if (PlayerController.localPlayer == null) {
-            Debug.Log("<Color=Red>Player Instantiate</Color> We are Instantiating LocalPlayer from " + SceneManager.GetActiveScene().name);
+            Debug.Log("<Color=Green>Player Instantiate</Color> We are Instantiating LocalPlayer from " + SceneManager.GetActiveScene().name);
             PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0);
         }
-        Debug.Log("<Color=Red>Start() for TTGameManager</Color>");
+        Debug.Log("<Color=Green>Start() for TTGameManager</Color>");
     }
 
     void Update() {

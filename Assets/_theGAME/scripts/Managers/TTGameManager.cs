@@ -37,7 +37,7 @@ public class TTGameManager : PunBehaviour {
             Debug.Log("<Color=Green>Player Instantiate</Color> We are Instantiating LocalPlayer from " + SceneManager.GetActiveScene().name);
             
             // Default spawn point
-            Vector3 spawnPoint = new Vector3(0, 3, 0);
+            Vector3 spawnPoint = new Vector3(0, 30, 0);
             // If array of spawn points exists, choose a random one
             if (spawnPoints != null && spawnPoints.Length > 0) spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
             Debug.Log("<Color=Green>Spawn Point chosen: </Color>" + spawnPoint);

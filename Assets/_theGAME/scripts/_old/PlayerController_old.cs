@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using Photon;
 
-public class PlayerControllerNEW : PunBehaviour {
+public class PlayerController_old : PunBehaviour {
 
     TTGameManager gameManager;
 
@@ -23,17 +23,6 @@ public class PlayerControllerNEW : PunBehaviour {
     public Text txtPlayerUsername;
 
     // Player movement
-    CharacterController controller;
-    public float walkSpeed = 2;
-    public float runSpeed = 6;
-    public float gravity = -12;
-    public float jumpHeight = 1;
-    public float speedSmoothTime = 0.1f;
-
-    float speedSmoothVelocity;
-    float currentSpeed;
-    float velocityY;
-
     private Rigidbody rb;
     public float playerSpeed = 3.0f;
     public float jumpForce = 4.0f;
@@ -54,9 +43,8 @@ public class PlayerControllerNEW : PunBehaviour {
 
         mainCamera = Camera.main;
         cameraController = mainCamera.GetComponent<CameraController>();
-
+        
         rb = GetComponent<Rigidbody>();
-        controller = GetComponent<CharacterController>();
 
         // Is this the localPlayer
         if (isLocalPlayer) {
@@ -117,35 +105,18 @@ public class PlayerControllerNEW : PunBehaviour {
         }
 
         // Player movement
-        var x = Input.GetAxis("Horizontal");
-        var z = Input.GetAxis("Vertical");
+        var x = Input.GetAxis("Horizontal") * Time.deltaTime * playerSpeed;
+        var z = Input.GetAxis("Vertical") * Time.deltaTime * playerSpeed;
 
-        // Rotation
         if (Input.GetMouseButton(0) && Input.GetMouseButton(1)) {
             if (z == 0) z = 1 * Time.deltaTime * 3.0f;
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
         } else if (!Input.GetMouseButton(0) && (x != 0f || z != 0f)) {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
         }
-        
-        // Jump
-        if (Input.GetKeyDown(KeyCode.Space)) Jump();
 
-        // Running
-        bool running = Input.GetKey(KeyCode.LeftShift);
-
-        // What speed do we desire?
-        float targetSpeed = ((running) ? runSpeed : walkSpeed) * ((x != 0 || z != 0) ? 1 : 0);
-        currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref speedSmoothVelocity, speedSmoothTime);
-
-        // Velocity & Direction
-        velocityY += Time.deltaTime * gravity;
-        Vector3 velocity = (transform.rotation * new Vector3(x, 0.0f, z)) * currentSpeed + Vector3.up * velocityY;
-
-        controller.Move(velocity * Time.deltaTime);
-
-        // Grounded?
-        if (controller.isGrounded) velocityY = 0;
+        rb.MovePosition(transform.position + transform.rotation * new Vector3(x, 0.0f, z));
+        if (Input.GetButtonDown("Jump")) rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 
     void LateUpdate() {
@@ -201,13 +172,6 @@ public class PlayerControllerNEW : PunBehaviour {
             //stream.SendNext(hasItem);
         } else {
             //hasItem = (bool)stream.ReceiveNext();
-        }
-    }
-
-    void Jump() {
-        if (controller.isGrounded) {
-            float jumpVelocity = Mathf.Sqrt(-2 * gravity * jumpHeight);
-            velocityY = jumpVelocity;
         }
     }
 

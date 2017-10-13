@@ -28,7 +28,7 @@ public class NetworkManager : PunBehaviour {
     private RoomOptions roomOptions;
 
     private readonly string RoomName = "talTESTTT Level 1";
-    private readonly string sceneName = "Level 1 - FINAL";
+    private readonly string sceneName = "Level 1 - DEMO";
 
     void Awake() {
         // Check if instance already exists, if not set instance to 'this', if instance is not 'this' destory 'this'

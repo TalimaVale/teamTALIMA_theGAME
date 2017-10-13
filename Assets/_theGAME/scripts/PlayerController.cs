@@ -6,7 +6,7 @@ public class PlayerController : PunBehaviour {
 
     TTGameManager gameManager;
 
-    [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
+    [Tooltip("The local player instance. Use this to know if the local player is represented in the scene")]
     public static GameObject localPlayer;
     public bool isLocalPlayer { get { return photonView.isMine; } }
 
@@ -19,14 +19,20 @@ public class PlayerController : PunBehaviour {
     
     // Player UI
     public Transform playerCanvas;
-    [Tooltip("The Player's UI GameObject Prefab")]
     public Text txtPlayerUsername;
 
     // Player movement
-    private Rigidbody rb;
-    public float playerSpeed = 3.0f;
-    public float jumpForce = 4.0f;
-    public float rotationSlerpSpeed = 224f;
+    CharacterController controller;
+    public float walkSpeed = 2f;
+    public float runSpeed = 6f;
+    public float rotationSpeed = 124f;
+    public float gravity = -12f;
+    public float jumpHeight = 1f;
+    public float speedSmoothTime = 0.1f;
+
+    float speedSmoothVelocity;
+    float currentSpeed;
+    float velocityY;
 
     // Player interaction
     public float playerReach = 3.0f;
@@ -43,8 +49,7 @@ public class PlayerController : PunBehaviour {
 
         mainCamera = Camera.main;
         cameraController = mainCamera.GetComponent<CameraController>();
-        
-        rb = GetComponent<Rigidbody>();
+        controller = GetComponent<CharacterController>();
 
         // Is this the localPlayer
         if (isLocalPlayer) {
@@ -77,7 +82,7 @@ public class PlayerController : PunBehaviour {
     void Update() {
         if (!isLocalPlayer) return;
 
-        // Player interaction
+        //// Player interaction
         hasItem = (heldItem == null) ? false : true;
 
         if (Input.GetButtonDown("Interact")) {
@@ -95,7 +100,7 @@ public class PlayerController : PunBehaviour {
             }
         }
 
-        // Reward Awesomeness Cooldown
+        //// Reward-Awesomeness Cooldown
         if (collectCountdown > 0) {
             double diff = PhotonNetwork.time - cdInitTime;
             collectCountdown = collectCooldown - diff;
@@ -104,19 +109,36 @@ public class PlayerController : PunBehaviour {
             //Debug.Log("Player cooldown: " + collectCountdown);
         }
 
-        // Player movement
-        var x = Input.GetAxis("Horizontal") * Time.deltaTime * playerSpeed;
-        var z = Input.GetAxis("Vertical") * Time.deltaTime * playerSpeed;
+        //// Player movement
+        var x = Input.GetAxis("Horizontal");
+        var z = Input.GetAxis("Vertical");
 
+        // Rotation
         if (Input.GetMouseButton(0) && Input.GetMouseButton(1)) {
-            if (z == 0) z = 1 * Time.deltaTime * 3.0f;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+            if (z == 0) z = 1;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSpeed);
         } else if (!Input.GetMouseButton(0) && (x != 0f || z != 0f)) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSpeed);
         }
+        
+        // Jump
+        if (Input.GetKeyDown(KeyCode.Space)) Jump();
 
-        rb.MovePosition(transform.position + transform.rotation * new Vector3(x, 0.0f, z));
-        if (Input.GetButtonDown("Jump")) rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        // Running
+        bool running = Input.GetKey(KeyCode.LeftShift);
+
+        // Speed?
+        float targetSpeed = ((running) ? runSpeed : walkSpeed) * ((x != 0 || z != 0) ? 1 : 0);
+        currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref speedSmoothVelocity, speedSmoothTime);
+
+        // Velocity & Direction
+        velocityY += Time.deltaTime * gravity;
+        Vector3 velocity = (transform.rotation * new Vector3(x, 0.0f, z)) * currentSpeed + Vector3.up * velocityY;
+
+        controller.Move(velocity * Time.deltaTime);
+
+        // Grounded?
+        if (controller.isGrounded) velocityY = 0;
     }
 
     void LateUpdate() {
@@ -172,6 +194,13 @@ public class PlayerController : PunBehaviour {
             //stream.SendNext(hasItem);
         } else {
             //hasItem = (bool)stream.ReceiveNext();
+        }
+    }
+
+    void Jump() {
+        if (controller.isGrounded) {
+            float jumpVelocity = Mathf.Sqrt(-2 * gravity * jumpHeight);
+            velocityY = jumpVelocity;
         }
     }
 

@@ -28,6 +28,7 @@ public class NetworkManager : PunBehaviour {
     private RoomOptions roomOptions;
 
     private readonly string RoomName = "talTESTTT Level 1";
+    private readonly string sceneName = "Level 1 - FINAL";
 
     void Awake() {
         // Check if instance already exists, if not set instance to 'this', if instance is not 'this' destory 'this'
@@ -93,7 +94,7 @@ public class NetworkManager : PunBehaviour {
         // #Critical, if we are the first player load level, else rely on PhotonNetwork.automaticallySyncScene to sync our instance scene
         if (PhotonNetwork.room.PlayerCount == 1) {
             // #Critical, load the level
-            PhotonNetwork.LoadLevel("Level 1");
+            PhotonNetwork.LoadLevel(sceneName);
         } else {
             Debug.Log("<Color=Blue>OnJoinedRoom()</Color> -- no Level loaded because there is more than 1 player here");
         }

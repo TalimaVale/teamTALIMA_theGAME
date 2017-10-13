@@ -2,11 +2,11 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor (typeof (MapGenerator))]
+[CustomEditor (typeof (MapPreview))]
 public class MapGeneratorEditor : Editor {
 
     public override void OnInspectorGUI() {
-        MapGenerator mapGen = (MapGenerator)target;
+        MapPreview mapGen = (MapPreview)target;
 
         if (DrawDefaultInspector()) {
             if (mapGen.autoUpdate) {

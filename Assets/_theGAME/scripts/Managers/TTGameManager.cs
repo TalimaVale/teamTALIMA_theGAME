@@ -35,7 +35,14 @@ public class TTGameManager : PunBehaviour {
             Debug.LogError("<Color=Red>Missing</Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'");
         } else if (PlayerController.localPlayer == null) {
             Debug.Log("<Color=Green>Player Instantiate</Color> We are Instantiating LocalPlayer from " + SceneManager.GetActiveScene().name);
-            PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0);
+            
+            // Default spawn point
+            Vector3 spawnPoint = new Vector3(0, 3, 0);
+            // If array of spawn points exists, choose a random one
+            if (spawnPoints != null && spawnPoints.Length > 0) spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+            Debug.Log("<Color=Green>Spawn Point chosen: </Color>" + spawnPoint);
+
+            PhotonNetwork.Instantiate(playerPrefab.name, spawnPoint, Quaternion.identity, 0);
         }
         Debug.Log("<Color=Green>Start() for TTGameManager</Color>");
     }

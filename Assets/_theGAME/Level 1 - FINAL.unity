@@ -145,7 +145,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 78883811}
-  m_Mesh: {fileID: 1831756345}
+  m_Mesh: {fileID: 1839340116}
 --- !u!23 &78883814
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1023,6 +1023,12 @@ Prefab:
       propertyPath: txtBawesomeness
       value: 
       objectReference: {fileID: 1797868150}
+    - target: {fileID: 114968167232915956, guid: 99df7dd5add20dd458073b06cfc6bf2e,
+        type: 2}
+      propertyPath: playerPrefab
+      value: 
+      objectReference: {fileID: 1416093075307488, guid: 35abf5e1fae5f764cace8d26376279b3,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 99df7dd5add20dd458073b06cfc6bf2e, type: 2}
   m_IsPrefabParent: 0
@@ -1456,7 +1462,7 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1797868148}
---- !u!43 &1831756345
+--- !u!43 &1839340116
 Mesh:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}

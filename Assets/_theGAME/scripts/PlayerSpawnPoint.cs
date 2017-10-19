@@ -6,6 +6,6 @@ public class PlayerSpawnPoint : MonoBehaviour {
 
     void OnDrawGizmosSelected() {
         Gizmos.color = Color.magenta;
-        Gizmos.DrawSphere(transform.position, 0.1f);
+        Gizmos.DrawSphere(transform.position, 1f);
     }
 }

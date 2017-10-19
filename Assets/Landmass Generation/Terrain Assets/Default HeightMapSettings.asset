@@ -21,7 +21,7 @@ MonoBehaviour:
     seed: 0
     offset: {x: 27, y: 212}
   useFalloff: 1
-  heightMultiplier: 30
+  heightMultiplier: 34
   heightCurve:
     serializedVersion: 2
     m_Curve:
@@ -38,10 +38,16 @@ MonoBehaviour:
       outSlope: -0.021317126
       tangentMode: 0
     - serializedVersion: 2
+      time: 0.6996766
+      value: 0.6019482
+      inSlope: 1.33425
+      outSlope: 3.5238373
+      tangentMode: 1
+    - serializedVersion: 2
       time: 1
       value: 1
-      inSlope: -0.3027359
-      outSlope: -0.3027359
+      inSlope: -0.149731
+      outSlope: -0.149731
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

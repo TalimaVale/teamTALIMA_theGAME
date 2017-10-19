@@ -122,7 +122,7 @@ public class PlayerController : PunBehaviour {
         }
         
         // Jump
-        if (Input.GetKeyDown(KeyCode.Space)) Jump();
+        if (Input.GetKey(KeyCode.Space)) Jump();
 
         // Running
         bool running = Input.GetKey(KeyCode.LeftShift);
@@ -133,7 +133,8 @@ public class PlayerController : PunBehaviour {
 
         // Velocity & Direction
         velocityY += Time.deltaTime * gravity;
-        Vector3 velocity = (transform.rotation * new Vector3(x, 0.0f, z)) * currentSpeed + Vector3.up * velocityY;
+        Vector3 direction = new Vector3(x, 0.0f, z).normalized;
+        Vector3 velocity = (transform.rotation * direction) * currentSpeed + Vector3.up * velocityY;
 
         controller.Move(velocity * Time.deltaTime);
 

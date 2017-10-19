@@ -4,11 +4,17 @@ using Photon;
 public class PlayerAnimations : PunBehaviour {
 
     public bool isLocalPlayer { get { return photonView.isMine; } }
+    public PlayerController playerController;
+
     Animator animator;
+    CharacterController controller;
 
 	// Use this for initialization
 	void Start () {
+        playerController = GetComponent<PlayerController>();
+
         animator = GetComponent<Animator>();
+        controller = GetComponent<CharacterController>();
     }
 	
 	// Update is called once per frame
@@ -29,5 +35,11 @@ public class PlayerAnimations : PunBehaviour {
 
         if(x < 0) animator.SetBool("isStrafeLEFT", true);
         else animator.SetBool("isStrafeLEFT", false);
+
+        if(playerController.heldItem != null) animator.SetLayerWeight(1, 1);
+        else animator.SetLayerWeight(1, 0);
+
+        //if (Input.GetKey(KeyCode.Space) && controller.isGrounded) animator.SetBool("isJumping", true);
+        //else animator.SetBool("isJumping", false);
     }
 }

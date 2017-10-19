@@ -101,7 +101,7 @@ public class MinigameCollectConsole : PunBehaviour {
             } else spawnPoint = new Vector3(Random.Range(-5.0f, 5.0f), transform.position.y, Random.Range(-5.0f, 5.0f));
         } else spawnPoint = new Vector3(Random.Range(-5.0f, 5.0f), transform.position.y, Random.Range(-5.0f, 5.0f));
 
-        photonView.RPC("InstantiateBlockInScene", PhotonTargets.MasterClient, block, spawnPoint, Quaternion.identity, 0, null);
+        photonView.RPC("InstantiateBlockInScene", PhotonTargets.MasterClient, block, spawnPoint, Quaternion.identity, (byte)0, null);
     }
 
 
@@ -139,7 +139,7 @@ public class MinigameCollectConsole : PunBehaviour {
     }
 
     [PunRPC] // called to MasterClient
-    public void InstantiateBlockInScene(string PrefabName, Vector3 Position, Quaternion Rotation, int Group, object[] Data) {
+    public void InstantiateBlockInScene(string PrefabName, Vector3 Position, Quaternion Rotation, byte Group, object[] Data) {
         Debug.Log("<Color=Magenta>InstantiateBlockInScene()</Color> -- Calling InstantiateBlockInScene");
 
         GameObject block = PhotonNetwork.InstantiateSceneObject(PrefabName, Position, Rotation, Group, Data);
@@ -160,8 +160,8 @@ public class MinigameCollectConsole : PunBehaviour {
         MinigameCollectBlock block = PhotonView.Find(blockViewID).GetComponent<MinigameCollectBlock>();
 
         if (Physics.OverlapSphere(transform.position, collectDis, 1 << gameObject.layer).Any(collider => collider.GetComponent<PhotonView>().viewID == blockViewID)) {
-            Debug.Log("The collider IS our minigameBlock");
-
+            Debug.Log("The collider IS close enough");
+            
             if (!block.hasOwner) {
                 block.transform.position = stackPos + new Vector3(0, block.transform.localScale.y / 2, 0);
 
@@ -335,7 +335,3 @@ public class MinigameCollectConsole : PunBehaviour {
 // TODO: spawnPoints array isUse boolean not synced. Consider -- InstantiateBlock an RPC and sync inUse to PT.All and OnPhotonPlayerConnect
 // TODO: Create and implement a method for RPC's Debug.Log line.
 // TODO: Consider adding UI Text element for MinigameWinTimer. Visual countdown to reward
-
-
-
-// Build Terrain (self-build: marching cubes, voxels) (asset store: Voxeland $95)

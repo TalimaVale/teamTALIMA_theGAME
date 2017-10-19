@@ -97,7 +97,7 @@ public class MinigameCollectBlock : PunBehaviour {
 
         // Attempt to find 'ground'
         RaycastHit hit;
-        if (Physics.BoxCast(owner.transform.position, new Vector3(.35f, .35f, .35f), Vector3.down, out hit, transform.rotation, dropDistance, -1)) {
+        if (Physics.BoxCast(owner.transform.position + owner.GetComponent<CharacterController>().center, new Vector3(.35f, .35f, .35f), Vector3.down, out hit, transform.rotation, dropDistance, ~(1 << 8))) {
             hit.point += new Vector3(0, (transform.localScale.y / 2) + dropHover, 0);
             transform.position = hit.point;
 
@@ -112,10 +112,12 @@ public class MinigameCollectBlock : PunBehaviour {
             // Remove visual lag
             if (isOwner) {
                 if (Physics.OverlapSphere(console.transform.position, console.collectDis, 1 << gameObject.layer).Any(collider => collider.GetComponent<MinigameCollectBlock>() == this)) {
-                    transform.position = console.stackPos + new Vector3(0, transform.localScale.y / 2, 0);
+                    if (!PhotonNetwork.isMasterClient) transform.position = console.stackPos + new Vector3(0, transform.localScale.y / 2, 0);
 
                     // Console attempts to collect dropped blocks
                     console.photonView.RPC("CollectBlocks", PhotonTargets.MasterClient, photonView.viewID, hit.point, ownerPhotonPlayer);
+                } else {
+                    Debug.Log("Not close enough to collect.");
                 }
             }
 

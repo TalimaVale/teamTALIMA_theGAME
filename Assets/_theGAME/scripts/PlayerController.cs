@@ -4,9 +4,9 @@ using Photon;
 
 public class PlayerController : PunBehaviour {
 
-    GameManager gameManager;
+    TTGameManager gameManager;
 
-    [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
+    [Tooltip("The local player instance. Use this to know if the local player is represented in the scene")]
     public static GameObject localPlayer;
     public bool isLocalPlayer { get { return photonView.isMine; } }
 
@@ -19,18 +19,24 @@ public class PlayerController : PunBehaviour {
     
     // Player UI
     public Transform playerCanvas;
-    [Tooltip("The Player's UI GameObject Prefab")]
     public Text txtPlayerUsername;
 
     // Player movement
-    private Rigidbody rb;
-    public float playerSpeed = 3.0f;
-    public float jumpForce = 4.0f;
-    public float rotationSlerpSpeed = 224f;
+    CharacterController controller;
+    public float walkSpeed = 2f;
+    public float runSpeed = 6f;
+    public float rotationSpeed = 124f;
+    public float gravity = -12f;
+    public float jumpHeight = 1f;
+    public float speedSmoothTime = 0.1f;
+
+    float speedSmoothVelocity;
+    float currentSpeed;
+    float velocityY;
 
     // Player interaction
-    public float playerReach = 3.0f;
-    public Vector3 holdLocalVector = new Vector3(0.0f, 0.5f, 1.1f);
+    public float playerReach = 5.0f;
+    public Vector3 holdLocalVector = new Vector3(0.0f, 3f, 1.2f);
     public GameObject heldItem;
     private bool hasItem;
 
@@ -39,40 +45,44 @@ public class PlayerController : PunBehaviour {
     private double cdInitTime;
 
     void Awake() {
-        gameManager = FindObjectOfType<GameManager>();
+        gameManager = FindObjectOfType<TTGameManager>();
 
         mainCamera = Camera.main;
         cameraController = mainCamera.GetComponent<CameraController>();
+        controller = GetComponent<CharacterController>();
 
         // Is this the localPlayer
         if (isLocalPlayer) {
             localPlayer = this.gameObject;
-            cameraController.target = transform;
+            cameraController.target = transform.Find("Camera Target");
         }
 
-        rb = GetComponent<Rigidbody>();
+        Debug.Log("My starting position: " + transform.position);
     }
 
     // Use this for initialization
     void Start() {
         playerCanvas = transform.Find("Player Canvas");
         txtPlayerUsername = GetComponentInChildren<Text>();
-        txtPlayerUsername.text = photonView.owner.NickName;
+
+        txtPlayerUsername.text = photonView.owner.NickName; // PhotonNetwork.player.NickName;
         
         hasItem = false;
 
+        // Is this the localPlayer
         if (isLocalPlayer) {
-            GetComponent<MeshRenderer>().material.color = new Color(8 / 255f, 168 / 255f, 241 / 255f, 1);
+            //GetComponent<MeshRenderer>().material.color = new Color(8 / 255f, 168 / 255f, 241 / 255f, 1);
             gameManager.txtBawesomeness.text = "Bawesomeness: " + bawesomeness;
         }
 
         Debug.Log("Our current bawesomeness: " + bawesomeness);
+        Debug.Log("My starting position: " + transform.position);
     }
 
     void Update() {
         if (!isLocalPlayer) return;
 
-        // Player interaction
+        //// Player interaction
         hasItem = (heldItem == null) ? false : true;
 
         if (Input.GetButtonDown("Interact")) {
@@ -90,7 +100,7 @@ public class PlayerController : PunBehaviour {
             }
         }
 
-        // Reward Awesomeness Cooldown
+        //// Reward-Awesomeness Cooldown
         if (collectCountdown > 0) {
             double diff = PhotonNetwork.time - cdInitTime;
             collectCountdown = collectCooldown - diff;
@@ -99,19 +109,37 @@ public class PlayerController : PunBehaviour {
             //Debug.Log("Player cooldown: " + collectCountdown);
         }
 
-        // Player movement
-        var x = Input.GetAxis("Horizontal") * Time.deltaTime * playerSpeed;
-        var z = Input.GetAxis("Vertical") * Time.deltaTime * playerSpeed;
+        //// Player movement
+        var x = Input.GetAxis("Horizontal");
+        var z = Input.GetAxis("Vertical");
 
+        // Rotation
         if (Input.GetMouseButton(0) && Input.GetMouseButton(1)) {
-            if (z == 0) z = 1 * Time.deltaTime * 3.0f;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+            if (z == 0) z = 1;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSpeed);
         } else if (!Input.GetMouseButton(0) && (x != 0f || z != 0f)) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSlerpSpeed);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, mainCamera.transform.rotation.eulerAngles.y, 0f), Time.deltaTime * rotationSpeed);
         }
+        
+        // Jump
+        if (Input.GetKey(KeyCode.Space)) Jump();
 
-        rb.MovePosition(transform.position + transform.rotation * new Vector3(x, 0.0f, z));
-        if (Input.GetButtonDown("Jump")) rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        // Running
+        bool running = Input.GetKey(KeyCode.LeftShift);
+
+        // Speed?
+        float targetSpeed = ((running) ? runSpeed : walkSpeed) * ((x != 0 || z != 0) ? 1 : 0);
+        currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref speedSmoothVelocity, speedSmoothTime);
+
+        // Velocity & Direction
+        velocityY += Time.deltaTime * gravity;
+        Vector3 direction = new Vector3(x, 0.0f, z).normalized;
+        Vector3 velocity = (transform.rotation * direction) * currentSpeed + Vector3.up * velocityY;
+
+        controller.Move(velocity * Time.deltaTime);
+
+        // Grounded?
+        if (controller.isGrounded) velocityY = 0;
     }
 
     void LateUpdate() {
@@ -135,7 +163,7 @@ public class PlayerController : PunBehaviour {
         } else if (cameraController.curDistance > 2.5f) {
             playerFade(1);
             // if camera is "between" optimal view distances, correct alpha if necesary
-        } else if (this.GetComponent<MeshRenderer>().material.color.a != 1) {
+        } else if (transform.Find("Body").GetComponent<SkinnedMeshRenderer>().material.color.a != 1) {
             cameraController.distance += fadeRate;
             playerFade(fadeRate);
         }
@@ -167,6 +195,13 @@ public class PlayerController : PunBehaviour {
             //stream.SendNext(hasItem);
         } else {
             //hasItem = (bool)stream.ReceiveNext();
+        }
+    }
+
+    void Jump() {
+        if (controller.isGrounded) {
+            float jumpVelocity = Mathf.Sqrt(-2 * gravity * jumpHeight);
+            velocityY = jumpVelocity;
         }
     }
 
@@ -212,6 +247,12 @@ public class PlayerController : PunBehaviour {
             Color color = renderers[i].material.color;
             color.a = Mathf.Clamp(color.a + alphaValue, 0, 1);
             renderers[i].material.color = color;
+        }
+        SkinnedMeshRenderer[] skinRenderers = localPlayer.GetComponentsInChildren<SkinnedMeshRenderer>();
+        for (int i = 0; i < skinRenderers.Length; i++) {
+            Color color = skinRenderers[i].material.color;
+            color.a = Mathf.Clamp(color.a + alphaValue, 0, 1);
+            skinRenderers[i].material.color = color;
         }
     }
 

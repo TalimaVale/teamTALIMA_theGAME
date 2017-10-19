@@ -25,7 +25,7 @@ GameObject:
   - component: {fileID: 135893957265836848}
   - component: {fileID: 95606006811436974}
   - component: {fileID: 114544974223249034}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Reward Awesomeness
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,11 +54,12 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 1d3cb725410dea345a13898daa073521, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -69,6 +70,7 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -112,6 +114,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0dfbe68ea4f0fbb489a14bf7fbb1b731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  value: 1
+  archSpeed: 7
+  cooldown: 10
 --- !u!114 &114636528422175984
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -1,0 +1,174 @@
+fileFormatVersion: 2
+guid: 512aa849694b5304f849c2ea89b9f306
+timeCreated: 1508277774
+licenseType: Free
+SubstanceImporter:
+  externalObjects: {}
+  serializedVersion: 5
+  materialInstances:
+  - serializedVersion: 16
+    name: Grass
+    prototypeName: Grass
+    shaderName: 
+    shader: {fileID: 7, guid: 0000000000000000f000000000000000, type: 0}
+    shaderKeywords: 
+    renderQueue: -1
+    lightmapFlags: 4
+    inputs:
+    - name: $outputsize
+      value:
+        scalar[0]: 8
+        scalar[1]: 8
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: $randomseed
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: DirtColor1
+      value:
+        scalar[0]: 0.5137931
+        scalar[1]: 0.47349563
+        scalar[2]: 0.32036513
+        scalar[3]: 1
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: DirtColor2
+      value:
+        scalar[0]: 0.80344826
+        scalar[1]: 0.74043274
+        scalar[2]: 0.50097364
+        scalar[3]: 1
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: DirtColor3
+      value:
+        scalar[0]: 1
+        scalar[1]: 0.9227941
+        scalar[2]: 0.625
+        scalar[3]: 1
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: DirtColor2MixAmount
+      value:
+        scalar[0]: 0.8
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: GrassColor1
+      value:
+        scalar[0]: 0.13485202
+        scalar[1]: 0.398693
+        scalar[2]: 0.397
+        scalar[3]: 1
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: GrassColor2
+      value:
+        scalar[0]: 0.355755
+        scalar[1]: 0.535948
+        scalar[2]: 0.359
+        scalar[3]: 1
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: GrassColor3
+      value:
+        scalar[0]: 0.593013
+        scalar[1]: 0.705882
+        scalar[2]: 0.434
+        scalar[3]: 1
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: GrassAmountContrast
+      value:
+        scalar[0]: 0.5
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: GrassAmount
+      value:
+        scalar[0]: 0.74
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+        stringvalue: 
+    - name: GrassBladesAmount
+      value:
+        scalar[0]: 0.14
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+        stringvalue: 
+    materialInformation:
+      serializedVersion: 5
+      offset: {x: 0, y: 0}
+      scale: {x: 1, y: 1}
+      generateMipmaps: 1
+      generateAllOutputs: 0
+      animationUpdateRate: 42
+    materialProperties:
+      serializedVersion: 3
+      texEnvs:
+      - _MainTex:
+          texture: {instanceID: 0}
+          scale: {x: 1, y: 1}
+          offset: {x: 0, y: 0}
+      floats:
+      - _BumpScale: 1
+      - _Cutoff: 0.5
+      - _DetailNormalMapScale: 1
+      - _DstBlend: 0
+      - _GlossMapScale: 1
+      - _Glossiness: 0.5
+      - _GlossyReflections: 1
+      - _Metallic: 0
+      - _Mode: 0
+      - _OcclusionStrength: 1
+      - _Parallax: 0.02
+      - _SmoothnessTextureChannel: 0
+      - _SpecularHighlights: 1
+      - _SrcBlend: 1
+      - _UVSec: 0
+      - _ZWrite: 1
+      colors:
+      - _Color: {r: 1, g: 1, b: 1, a: 1}
+      - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    textureParameters:
+    - name: Grass_basecolor
+      alphaSource: 1
+      filterMode: 1
+      aniso: 1
+      wrapMode: 0
+    textureAssignments:
+    - shaderProp: _MainTex
+      material: {instanceID: 0}
+      baseUID: 3088923084
+    buildTargetSettings:
+    - serializedVersion: 2
+      buildTarget: 
+      textureWidth: 512
+      textureHeight: 512
+      textureFormat: 0
+      loadingBehavior: 1
+    - serializedVersion: 2
+      buildTarget: Standalone
+      textureWidth: 512
+      textureHeight: 512
+      textureFormat: 0
+      loadingBehavior: 1
+  deletedPrototypes: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

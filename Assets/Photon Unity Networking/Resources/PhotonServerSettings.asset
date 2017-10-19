@@ -74,4 +74,5 @@ MonoBehaviour:
   - ParticleShieldWin
   - ResetStackedBlockPos
   - OnCollect
+  - OnRespawn
   DisableAutoOpenWizard: 1

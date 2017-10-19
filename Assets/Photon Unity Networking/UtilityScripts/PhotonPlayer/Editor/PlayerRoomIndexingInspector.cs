@@ -47,7 +47,10 @@ namespace ExitGames.UtilityScripts
 					foreach(int ID in _target.PlayerIds)
 					{
 						GUI.enabled = ID!=0;
-						EditorGUILayout.LabelField("Player " +index + (PhotonNetwork.player.ID==ID?" - You -":""), ID==0?"n/a":PhotonPlayer.Find(ID).ToStringFull());
+						EditorGUILayout.LabelField("Player " +index + 
+						                           (PhotonNetwork.player.ID==ID?" - You -":"") +
+						                           (PhotonNetwork.masterClient.ID==ID?" Master":"")
+						                           , ID==0?"n/a":PhotonPlayer.Find(ID).ToStringFull());
 						GUI.enabled = true;
 						index++;
 					}

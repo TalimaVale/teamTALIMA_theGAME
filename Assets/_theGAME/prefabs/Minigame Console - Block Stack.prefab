@@ -298,7 +298,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 602ff9c3b0d75964cbb709978db402e6, type: 2}
+  - {fileID: 2100000, guid: eb52f167f40282a4693a2e010013bbf2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -469,7 +469,7 @@ MonoBehaviour:
     m_Bits: 4294966984
   stackPos: {x: 0, y: 0, z: 0}
   stackPadding: 0.6
-  winTotal: 3
+  winTotal: 5
   archPoint: {x: 0, y: 0, z: 0}
   archDuration: 2
   resetTimeThreshold: 10

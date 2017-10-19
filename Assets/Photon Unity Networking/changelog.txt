@@ -1,3 +1,41 @@
+v1.85 (6. July 2017)
+Fixed: Interest Groups IDs are now of type byte for Instantiate (and all related code) as well. This fixes a cast exception.
+Fixed: Internal use of NetworkingPeer.IsInitialConnect. It's now reset when the connection fails while connecting. This (currently) affects the "connected" and "connecting" values, which is likely to change. This fix is minimal by design.
+Updated: PUN to no longer make use of obsolete enum values of the Photon library (dll).
+Updated: Chat API and ChatGui. Now uses a thread to call SendOutgoingCommands, which keeps connections up (except on WebGL, where threading is not available).
+Updated: To Photon library v4.1.1.14 with various fixes. See plugins\release_history.txt.
+
+
+v1.84.1 (2. June 2017)
+Fixed: A minor bug in the Photon3Unity3d.dll, which is now v4.1.1.13. The StreamBuffer.Seek() could fail to seek position 0 when length is 0.
+
+v1.84 (30. May 2017)
+Fixed: PlayerRoomIndexing can now be added at runtime even on non MasterClient instance. master player is now indicated in the inspector.
+Updated: NetworkingPeer.RunViewUpdate allocates less memory.
+Moved: ReorderableListResources to namespace Photon.Pun to avoid conflicts with other "Rotorz" variants. This is an internal Editor-only change.
+Updated: Unity 2017 Support.
+Added: Support for a Switch add-on. You need to be certified developer for the platform to get access for this. Contact us by mail: developer@photonengine.com
+Changed: SocketWebTcp to handle status changes for the used WebSocket. This fixes uncommon issues in WebGL exports.
+Changed: SocketUdp.cs to lock less parts of the DNS / connection setup, which avoids potential freezes.
+Updated: To Photon library v4.1.1.12 with various fixes. See plugins\release_history.txt.
+
+v1.83 (13. April 2017)
+Fixed: A bug in the Photon3Unity3D.dll which led to timeouts. The bug was in v4.1.1.10 (PUN v1.82) and is fixed in v4.1.1.11 (now used in PUN v1.83).
+
+v1.82 (12. April 2017)
+Fixed: Memory allocation in OnSerializeWrite(), when the view doesn't write data to the stream.
+Removed: Conversion Wizard for very old Unity Networking projects of Unity 4.x. There is no automatic conversion possible for Unity 5.x "uNet" networking.
+Moved: hasVoice and hasChat values are now in the general PhotonEditorUtils as HasVoice and HasChat, available to more Photon editor-classes if needed. Also, make sure to use HasCheckedProducts.
+Added: RoomOption.DeleteNullProperties. When set to true, the server will delete Custom Room properties, when they are set to null as value. Defaults to off/false but can be really useful to keep the number of room-properties in check. The Photon Cloud update for this is scheduled after the Easter holidays (20th April or so). Before that date, the server will not use the new setting (but clients can prepare to send it already).
+Fixed: Room.SetCustomProperties() to delete keys with null as value (the client that was setting the custom props did keep the key/value until until it was updated). The callback OnPhotonCustomRoomPropertiesChanged still has the keys with null values. They just don't get stored in Room.CustomProperties anymore.
+Changed: Interest Groups IDs are now of type byte, as used by the Photon servers. It was an integer before but for the wrong reasons. This affects PhotonView.group, PhotonNetwork.SetSendingEnabled() and PhotonNetwork.SetReceivingEnabled(). The method SetReceivingEnabled is replaced by SetInterestGroups(). When you update, make sure to use the correct order of parameters.
+Changed: UtilityScripts folder. Some scripts were not useful and got moved or deleted. General clean up.
+Removed: PlayerVariables script content. It's completely replaced with the ColorPerPlayer script, which is more versatile.
+Added: Checks of mandatory configuration values for console exports to make sure no setting is missing. In doubt, look out for error logs or a NotSupportedException on connect.
+Fixed: The server selection "Best Region" now supports clusters, if sent by the Name Server. Clusters are optionally used by Exit Games as set of machines in a region. As before, PUN only stores the best region, not the cluster. The idea is that this automatically selects a fitting region (not a specific cluster).
+Added: PhotonNetwork.CloudRegion to make the currently used Cloud Region accessible. This is mostly to expose existing values and to make debugging a little easier.
+Updated: To Photon3Unity3D.dll v4.1.1.10 with some additional improvements in terms of memory usage.
+
 v1.81 (16. March 2017)
 Updated: Basic Demo Launcher.cs: removed Log Level setup, it's now done in the Photon Settings.
 Updated: Chat Demo ChatGui.cs: removed running in background setup, it's now done in the Photon settings.
@@ -15,7 +53,6 @@ Fixed: ColorPerPlayerApply.cs: Disable routine was not safe and would throw erro
 Changed: WebGL exports will now use secure https "GetPing" requests. This enables Best Region for content on https hosting.
 Changed: The fallback thread to keep connections doesn't have to run when in offlineMode.
 Updated: The Photon assemblies to v4.1.1.9, which includes several fixes. E.g. "WouldBlock Exception" and "BlockCopy Exception". More info is in the release history file for the dll.
-
 
 v1.80 (15. December 2016)
 Fixed: PhotonTransformView first take routine to take in consideration what to update instead of forcing position, rotation scale no matter what.

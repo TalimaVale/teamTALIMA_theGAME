@@ -35,8 +35,8 @@ public class PlayerController : PunBehaviour {
     float velocityY;
 
     // Player interaction
-    public float playerReach = 3.0f;
-    public Vector3 holdLocalVector = new Vector3(0.0f, 0.5f, 1.1f);
+    public float playerReach = 5.0f;
+    public Vector3 holdLocalVector = new Vector3(0.0f, 3f, 1.2f);
     public GameObject heldItem;
     private bool hasItem;
 
@@ -54,7 +54,7 @@ public class PlayerController : PunBehaviour {
         // Is this the localPlayer
         if (isLocalPlayer) {
             localPlayer = this.gameObject;
-            cameraController.target = transform;
+            cameraController.target = transform.Find("Camera Target");
         }
 
         Debug.Log("My starting position: " + transform.position);
@@ -71,7 +71,7 @@ public class PlayerController : PunBehaviour {
 
         // Is this the localPlayer
         if (isLocalPlayer) {
-            GetComponent<MeshRenderer>().material.color = new Color(8 / 255f, 168 / 255f, 241 / 255f, 1);
+            //GetComponent<MeshRenderer>().material.color = new Color(8 / 255f, 168 / 255f, 241 / 255f, 1);
             gameManager.txtBawesomeness.text = "Bawesomeness: " + bawesomeness;
         }
 
@@ -162,7 +162,7 @@ public class PlayerController : PunBehaviour {
         } else if (cameraController.curDistance > 2.5f) {
             playerFade(1);
             // if camera is "between" optimal view distances, correct alpha if necesary
-        } else if (this.GetComponent<MeshRenderer>().material.color.a != 1) {
+        } else if (transform.Find("Body").GetComponent<SkinnedMeshRenderer>().material.color.a != 1) {
             cameraController.distance += fadeRate;
             playerFade(fadeRate);
         }
@@ -246,6 +246,12 @@ public class PlayerController : PunBehaviour {
             Color color = renderers[i].material.color;
             color.a = Mathf.Clamp(color.a + alphaValue, 0, 1);
             renderers[i].material.color = color;
+        }
+        SkinnedMeshRenderer[] skinRenderers = localPlayer.GetComponentsInChildren<SkinnedMeshRenderer>();
+        for (int i = 0; i < skinRenderers.Length; i++) {
+            Color color = skinRenderers[i].material.color;
+            color.a = Mathf.Clamp(color.a + alphaValue, 0, 1);
+            skinRenderers[i].material.color = color;
         }
     }
 

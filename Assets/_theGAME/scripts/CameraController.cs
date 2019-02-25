@@ -37,7 +37,7 @@ public class CameraController : MonoBehaviour
     public MouseButton panMouseButton = MouseButton.LeftOrRightMouseButton; // Mouse button that must be pressed while panning.
     public bool panLocksMouse = false;              // Does the mouse lock to the game window when panning?
 
-    public float zoomSpeed = 12f;                    // Mouse scrollwheel multiplier
+    public float zoomSpeed = 12f;                   // Mouse scrollwheel multiplier
     public float zoomLerpSpeed = 10f;               // Lerp speed of the camera zoom
     public float zoomLerpClipSpeed = 50f;           // Lerp speed of the camera zoom when forced to move because of a raycast hit
 
@@ -55,8 +55,8 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate() {
 
-        // Check if we are clicking on the UI
-        if (Input.GetMouseButton(0)) {
+        // Check if we are clicking or scrolling over the UI
+        if (Input.GetMouseButton(0) || Input.GetAxis("Mouse ScrollWheel") != 0) {
             var pointer = new PointerEventData(EventSystem.current);
             pointer.position = Input.mousePosition;
 
@@ -64,8 +64,9 @@ public class CameraController : MonoBehaviour
             EventSystem.current.RaycastAll(pointer, hits);
 
             // Is the player interacting with the UI?
-            if (hits.Any(hitUI => hitUI.gameObject.name == "BTN - Disconnect")) {
-                Debug.Log("We are disconnecting");
+            if (hits.Any(hitUI => hitUI.gameObject.layer == 5)) {
+                //Debug.Log("We are clicking or scrolling over the UI");
+                UpdateCameraTransform(transform.rotation);
             // If not, update camera
             } else {
                 UpdateCamera();
@@ -74,6 +75,20 @@ public class CameraController : MonoBehaviour
         } else {
             UpdateCamera();
         }
+    }
+
+    public void UpdateCameraTransform(Quaternion rotation) {
+        float prevDistance = _curDistance;
+        Vector3 ray = rotation * Vector3.back;
+
+        // camera clipping?
+        RaycastHit hit;
+        if (Physics.SphereCast(target.position, minSurfaceDistance, ray, out hit, distance, raycastLayerMask)) {
+            _curDistance = Mathf.Lerp(prevDistance, hit.distance, Time.deltaTime * zoomLerpClipSpeed);
+        }
+
+        transform.position = target.position + (ray * _curDistance);
+        transform.rotation = rotation;
     }
 
     public void UpdateCamera() {
@@ -124,8 +139,9 @@ public class CameraController : MonoBehaviour
             //Debug.DrawRay(target.position, ray * _distance, Color.blue);
 
             // set camera's new position + rotation
-            transform.position = target.position + (ray * _curDistance);
-            transform.rotation = rotation;
+            UpdateCameraTransform(rotation);
+            //transform.position = target.position + (ray * _curDistance);
+            //transform.rotation = rotation;
         } else {
             transform.position += (transform.forward * -1) * Time.deltaTime;
         }

@@ -14,10 +14,16 @@ using System.Security.Authentication;
 public class WebSocket
 {
     private Uri mUrl;
+    /// <summary>Photon uses this to agree on a serialization protocol. Either: GpBinaryV16 or GpBinaryV18. Based on enum SerializationProtocol.</summary>
+    private string protocols = "GpBinaryV16";
 
-    public WebSocket(Uri url)
+    public WebSocket(Uri url, string protocols = null)
     {
-        mUrl = url;
+        this.mUrl = url;
+        if (protocols != null)
+        {
+            this.protocols = protocols;
+        }
 
         string protocol = mUrl.Scheme;
         if (!protocol.Equals("ws") && !protocol.Equals("wss"))
@@ -39,7 +45,7 @@ public class WebSocket
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")]
-    private static extern int SocketCreate (string url);
+    private static extern int SocketCreate (string url, string protocols);
 
     [DllImport("__Internal")]
     private static extern int SocketState (int socketInstance);
@@ -78,7 +84,7 @@ public class WebSocket
 
     public void Connect()
     {
-        m_NativeRef = SocketCreate (mUrl.ToString());
+        m_NativeRef = SocketCreate (mUrl.ToString(), this.protocols);
 
         //while (SocketState(m_NativeRef) == 0)
         //    yield return 0;
@@ -115,7 +121,7 @@ public class WebSocket
 
     public void Connect()
     {
-        m_Socket = new WebSocketSharp.WebSocket(mUrl.ToString(), new string[] { "GpBinaryV16" });// modified by TS
+        m_Socket = new WebSocketSharp.WebSocket(mUrl.ToString(), new string[] { this.protocols });
         m_Socket.SslConfiguration.EnabledSslProtocols = m_Socket.SslConfiguration.EnabledSslProtocols | (SslProtocols)(3072| 768);
         m_Socket.OnMessage += (sender, e) => m_Messages.Enqueue(e.RawData);
         m_Socket.OnOpen += (sender, e) => m_IsConnected = true;

@@ -22,7 +22,7 @@ public class NetworkManager : PunBehaviour {
     [Tooltip("UI Text informing player the connection is in progress")]
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
 
-    string _gameVersion = "0.0.4";  // client version
+    string _gameVersion = "0.0.5";  // client version
     bool isConnecting;              // are we currently connecting
 
     private RoomOptions roomOptions;
@@ -54,7 +54,7 @@ public class NetworkManager : PunBehaviour {
         //roomOptions.CustomRoomProperties.Add("M1", false);
     }
 
-    ///<summary>
+    /// <summary>
     /// Start the connection process. If connected load 'Level 1', else connect to Photon Server.
     /// </summary>
     public void Connect() {

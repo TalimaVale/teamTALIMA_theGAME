@@ -35,7 +35,7 @@ public class PunWizardText
     public string CloseWindowButton = "Close";
     public string SkipButton = "Skip";
     public string SetupButton = "Setup Project";
-    public string MobileExportNoteLabel = "Build for mobiles impossible. Get PUN+ or Unity Pro for mobile or use Unity 5.";
+    public string MobileExportNoteLabel = "Build for mobiles impossible. Get PUN+ or Unity 4 Pro for mobile or use Unity 5 or newer.";
     public string MobilePunPlusExportNoteLabel = "PUN+ available. Using native sockets for iOS/Android.";
     public string CancelButton = "Cancel";
     public string PUNWizardLabel = "PUN Wizard";
@@ -96,21 +96,21 @@ public class PhotonEditor : EditorWindow
 
     protected static string DocumentationLocation = "Assets/Photon Unity Networking/PhotonNetwork-Documentation.pdf";
 
-    protected static string UrlFreeLicense = "https://www.photonengine.com/dashboard/OnPremise";
+    protected static string UrlFreeLicense = "https://dashboard.photonengine.com/en-US/SelfHosted";
 
-    protected static string UrlDevNet = "http://doc.photonengine.com/en/pun/current";
+    protected static string UrlDevNet = "https://doc.photonengine.com/en-us/pun/current";
 
-    protected static string UrlForum = "http://forum.exitgames.com";
+    protected static string UrlForum = "https://forum.photonengine.com";
 
-    protected static string UrlCompare = "http://doc.photonengine.com/en/realtime/current/getting-started/onpremise-or-saas";
+    protected static string UrlCompare = "https://doc.photonengine.com/en-us/realtime/current/getting-started/onpremise-or-saas";
 
-    protected static string UrlHowToSetup = "http://doc.photonengine.com/en/onpremise/current/getting-started/photon-server-in-5min";
+    protected static string UrlHowToSetup = "https://doc.photonengine.com/en-us/onpremise/current/getting-started/photon-server-in-5min";
 
-    protected static string UrlAppIDExplained = "http://doc.photonengine.com/en/realtime/current/getting-started/obtain-your-app-id";
+    protected static string UrlAppIDExplained = "https://doc.photonengine.com/en-us/realtime/current/getting-started/obtain-your-app-id";
 
-    protected static string UrlAccountPage = "https://www.photonengine.com/Account/SignIn?email="; // opened in browser
+    protected static string UrlAccountPage = "https://dashboard.photonengine.com/Account/SignIn?email="; // opened in browser
 
-    protected static string UrlCloudDashboard = "https://www.photonengine.com/dashboard?email=";
+    protected static string UrlCloudDashboard = "https://dashboard.photonengine.com?email=";
 
 
     private enum PhotonSetupStates
@@ -149,9 +149,19 @@ public class PhotonEditor : EditorWindow
     // setup once on load
     static PhotonEditor()
     {
+		#if UNITY_2017_2_OR_NEWER
+		EditorApplication.playModeStateChanged += PlaymodeStateChanged;
+		#else
+		EditorApplication.playmodeStateChanged += PlaymodeStateChanged;
+		#endif
+
+        #if UNITY_2018
+		EditorApplication.projectChanged += EditorUpdate;
+        EditorApplication.hierarchyChanged += EditorUpdate;
+        #else
         EditorApplication.projectWindowChanged += EditorUpdate;
         EditorApplication.hierarchyWindowChanged += EditorUpdate;
-        EditorApplication.playmodeStateChanged += PlaymodeStateChanged;
+        #endif
         EditorApplication.update += OnUpdate;
 
         // detect optional packages
@@ -193,7 +203,7 @@ public class PhotonEditor : EditorWindow
         // after a compile, check RPCs to create a cache-list
         if (!postCompileActionsDone && !EditorApplication.isCompiling && !EditorApplication.isPlayingOrWillChangePlaymode && PhotonNetwork.PhotonServerSettings != null)
         {
-            #if UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5 || UNITY_5_0
+			#if UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5 || UNITY_5_0 || UNITY_5_3_OR_NEWER
             if (EditorApplication.isUpdating)
             {
                 return;
@@ -203,7 +213,7 @@ public class PhotonEditor : EditorWindow
             PhotonEditor.UpdateRpcList();
             postCompileActionsDone = true; // on compile, this falls back to false (without actively doing anything)
 
-            #if UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5 || UNITY_5_0
+			#if UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5 || UNITY_5_0 || UNITY_5_3_OR_NEWER
             PhotonEditor.ImportWin8Support();
             #endif
         }
@@ -249,7 +259,11 @@ public class PhotonEditor : EditorWindow
 
 
     // called in editor on change of play-mode (used to show a message popup that connection settings are incomplete)
+	#if UNITY_2017_2_OR_NEWER
+    private static void PlaymodeStateChanged(PlayModeStateChange state)
+    #else
     private static void PlaymodeStateChanged()
+    #endif
     {
         if (EditorApplication.isPlaying || !EditorApplication.isPlayingOrWillChangePlaymode)
         {
@@ -479,8 +493,8 @@ public class PhotonEditor : EditorWindow
             GUILayout.Label(CurrentLang.MobilePunPlusExportNoteLabel);
             GUILayout.Space(15);
         }
-#if !(UNITY_5_0 || UNITY_5)
-        else if (!InternalEditorUtility.HasAdvancedLicenseOnBuildTarget(BuildTarget.Android) || !InternalEditorUtility.HasAdvancedLicenseOnBuildTarget(BuildTarget.iOS))
+#if !(UNITY_5_0 || UNITY_5 || UNITY_5_3_OR_NEWER)
+        else if (!InternalEditorUtility.HasAdvancedLicenseOnBuildTarget(BuildTarget.Android) || !InternalEditorUtility.HasAdvancedLicenseOnBuildTarget(BuildTarget.iPhone))
         {
             GUILayout.Label(CurrentLang.MobileExportNoteLabel);
             GUILayout.Space(15);
@@ -554,7 +568,7 @@ public class PhotonEditor : EditorWindow
         {
             accountServiceType = "voice";
         }
-        
+
 
         AccountService client = new AccountService();
         client.RegisterByEmail(email, RegisterOrigin, accountServiceType); // this is the synchronous variant using the static RegisterOrigin. "result" is in the client
@@ -611,7 +625,7 @@ public class PhotonEditor : EditorWindow
             return; // don't import while compiling
         }
 
-        #if UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5 || UNITY_5_0
+		#if UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5 || UNITY_5_0 || UNITY_5_3_OR_NEWER
         const string win8Package = "Assets/Plugins/Photon3Unity3D-Win8.unitypackage";
 
         bool win8LibsExist = File.Exists("Assets/Plugins/WP8/Photon3Unity3D.dll") && File.Exists("Assets/Plugins/Metro/Photon3Unity3D.dll");
@@ -648,24 +662,25 @@ public class PhotonEditor : EditorWindow
 
         var types = GetAllSubTypesInScripts(typeof(MonoBehaviour));
 
-        int countOldRpcs = 0;
+        //int countOldRpcs = 0;
         foreach (var mono in types)
         {
             MethodInfo[] methods = mono.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             foreach (MethodInfo method in methods)
             {
-                bool isOldRpc = false;
-                #pragma warning disable 618
-                // we let the Editor check for outdated RPC attributes in code. that should not cause a compile warning
-                if (method.IsDefined(typeof (RPC), false))
-                {
-                    countOldRpcs++;
-                    isOldRpc = true;
-                }
-                #pragma warning restore 618
+                //bool isOldRpc = false;
+                //#pragma warning disable 618
+                //// we let the Editor check for outdated RPC attributes in code. that should not cause a compile warning
+                //if (method.IsDefined(typeof (RPC), false))
+                //{
+                //    countOldRpcs++;
+                //    isOldRpc = true;
+                //}
+                //#pragma warning restore 618
 
-                if (isOldRpc || method.IsDefined(typeof(PunRPC), false))
+                //if (isOldRpc || method.IsDefined(typeof(PunRPC), false))
+                if (method.IsDefined(typeof(PunRPC), false))
                 {
                     currentRpcs.Add(method.Name);
 
@@ -706,15 +721,6 @@ public class PhotonEditor : EditorWindow
             Undo.RecordObject(PhotonNetwork.PhotonServerSettings, "Update PUN RPC-list");
             PhotonNetwork.PhotonServerSettings.RpcList.AddRange(additionalRpcs);
             PhotonEditor.SaveSettings();
-        }
-
-        if (countOldRpcs > 0)
-        {
-            bool convertRPCs = EditorUtility.DisplayDialog(CurrentLang.RpcFoundDialogTitle, CurrentLang.RpcFoundMessage, CurrentLang.RpcReplaceButton, CurrentLang.RpcSkipReplace);
-            if (convertRPCs)
-            {
-                PhotonConverter.ConvertRpcAttribute("");
-            }
         }
     }
 

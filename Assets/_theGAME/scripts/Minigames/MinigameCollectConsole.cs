@@ -238,7 +238,7 @@ public class MinigameCollectConsole : PunBehaviour {
         }
 
         // Reward players
-        for (int i = 0; i < playerCount; i++) {
+        for (int i = 0; i < playerCount * 3; i++) {
             GameObject coin = PhotonNetwork.InstantiateSceneObject("Reward Awesomeness", transform.position, Quaternion.Euler(0.0f, 0.0f, -90.0f), 0, null);
 
             // Coin's endpoint = random direction * distance from console + console's position

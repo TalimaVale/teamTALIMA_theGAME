@@ -4,10 +4,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-#if UNITY_5 && (!UNITY_5_0 && !UNITY_5_1 && !UNITY_5_2 && !UNITY_5_3) || UNITY_6
-#define UNITY_MIN_5_4
-#endif
-
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -19,6 +15,11 @@ using SupportClassPun = ExitGames.Client.Photon.SupportClass;
 
 #if UNITY_5_5_OR_NEWER
 using UnityEngine.Profiling;
+#endif
+
+
+#if UNITY_WEBGL
+#pragma warning disable 0649
 #endif
 
 /// <summary>
@@ -35,7 +36,7 @@ internal class PhotonHandler : MonoBehaviour
     private int nextSendTickCount = 0;
 
     private int nextSendTickCountOnSerialize = 0;
-
+	
     private static bool sendThreadShouldRun;
 
     private static Stopwatch timerToStopConnectionInBackground;
@@ -61,14 +62,15 @@ internal class PhotonHandler : MonoBehaviour
     }
 
 
-    #if UNITY_MIN_5_4
+	#if UNITY_5_4_OR_NEWER
 
     protected void Start()
     {
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += (scene, loadingMode) =>
         {
             PhotonNetwork.networkingPeer.NewSceneLoaded();
-            PhotonNetwork.networkingPeer.SetLevelInPropsIfSynced(SceneManagerHelper.ActiveSceneName);
+            PhotonNetwork.networkingPeer.SetLevelInPropsIfSynced(SceneManagerHelper.ActiveSceneName, false);
+			PhotonNetwork.networkingPeer.IsReloadingLevel = false;
         };
     }
 
@@ -78,7 +80,9 @@ internal class PhotonHandler : MonoBehaviour
     protected void OnLevelWasLoaded(int level)
     {
         PhotonNetwork.networkingPeer.NewSceneLoaded();
-        PhotonNetwork.networkingPeer.SetLevelInPropsIfSynced(SceneManagerHelper.ActiveSceneName);
+        PhotonNetwork.networkingPeer.SetLevelInPropsIfSynced(SceneManagerHelper.ActiveSceneName, false);
+		PhotonNetwork.networkingPeer.IsReloadingLevel = false;
+		PhotonNetwork.networkingPeer.AsynchLevelLoadCall = false;
     }
 
     #endif
@@ -189,7 +193,7 @@ internal class PhotonHandler : MonoBehaviour
 
     protected void OnCreatedRoom()
     {
-        PhotonNetwork.networkingPeer.SetLevelInPropsIfSynced(SceneManagerHelper.ActiveSceneName);
+        PhotonNetwork.networkingPeer.SetLevelInPropsIfSynced(SceneManagerHelper.ActiveSceneName, false);
     }
 
     public static void StartFallbackSendAckThread()
@@ -232,7 +236,7 @@ internal class PhotonHandler : MonoBehaviour
                 }
             }
 
-            if (PhotonNetwork.networkingPeer.ConnectionTime - PhotonNetwork.networkingPeer.LastSendOutgoingTime > 200)
+            if (!PhotonNetwork.isMessageQueueRunning || PhotonNetwork.networkingPeer.ConnectionTime - PhotonNetwork.networkingPeer.LastSendOutgoingTime > 200)
             {
                 PhotonNetwork.networkingPeer.SendAcksOnly();
             }

@@ -24,7 +24,7 @@ public class PlayerAnimations : PunBehaviour {
         var x = Input.GetAxis("Horizontal");
         var z = Input.GetAxis("Vertical");
 
-        if(z > 0) animator.SetBool("isWalkFWD", true);
+        if(z > 0 || Input.GetMouseButton(0) && Input.GetMouseButton(1)) animator.SetBool("isWalkFWD", true);
         else animator.SetBool("isWalkFWD", false);
 
         if(z < 0) animator.SetBool("isWalkBKD", true);

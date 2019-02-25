@@ -49,11 +49,14 @@ public class PlayerController : PunBehaviour {
 
         mainCamera = Camera.main;
         cameraController = mainCamera.GetComponent<CameraController>();
+
         controller = GetComponent<CharacterController>();
 
         // Is this the localPlayer
         if (isLocalPlayer) {
             localPlayer = this.gameObject;
+            gameManager.localPlayer = localPlayer;
+
             cameraController.target = transform.Find("Camera Target");
         }
 

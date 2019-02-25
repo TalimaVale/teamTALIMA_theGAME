@@ -3,6 +3,7 @@ using System.Net;
 using System.Collections;
 using System.Diagnostics;
 using ExitGames.Client.Photon;
+using Photon.Realtime;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using SupportClassPun = ExitGames.Client.Photon.SupportClass;
@@ -174,32 +175,39 @@ public class PhotonPingManager
         region.Ping = Attempts*MaxMilliseconsPerPing;
 
         this.PingsRunning++; // TODO: Add try-catch to make sure the PingsRunning are reduced at the end and that the lib does not crash the app
-        PhotonPing ping;
+        PhotonPing ping = null;
+        
+        #if NATIVE_SOCKETS && NATIVE_SOCKETS_STATIC
+        if (PhotonHandler.PingImplementation == typeof(PingNativeStatic))
+        {
+            Debug.Log("Using constructor for new PingNativeStatic()"); // it seems on Switch, the Activator can't find the default Constructor
+            ping = new PingNativeStatic();
+        }
+        #elif NATIVE_SOCKETS
         if (PhotonHandler.PingImplementation == typeof(PingNativeDynamic))
         {
             Debug.Log("Using constructor for new PingNativeDynamic()"); // it seems on Android, the Activator can't find the default Constructor
             ping = new PingNativeDynamic();
         }
-        else if(PhotonHandler.PingImplementation == typeof(PingNativeStatic))
-        {
-            Debug.Log("Using constructor for new PingNativeStatic()"); // it seems on Switch, the Activator can't find the default Constructor
-            ping = new PingNativeStatic();
-        }
-        else if (PhotonHandler.PingImplementation == typeof(PingMono))
-        {
-            ping = new PingMono(); // using this type explicitly saves it from IL2CPP bytecode stripping
-        }
-        #if UNITY_WEBGL
-        else if (PhotonHandler.PingImplementation == typeof(PingHttp))
+        #elif UNITY_WEBGL
+        if (PhotonHandler.PingImplementation == typeof(PingHttp))
         {
             ping = new PingHttp();
         }
+        #elif NETFX_CORE
+        ping = new PingWindowsStore();
+        #else
+        if (PhotonHandler.PingImplementation == typeof(PingMono))
+        {
+            ping = new PingMono(); // using this type explicitly saves it from IL2CPP bytecode stripping
+        }
         #endif
-        else
+
+        if (ping == null)
         {
             ping = (PhotonPing)Activator.CreateInstance(PhotonHandler.PingImplementation);
         }
-
+        
         //Debug.Log(region);
 
         float rttSum = 0.0f;
@@ -224,7 +232,7 @@ public class PhotonPingManager
 		}
         regionAddress = ResolveHost(regionAddress);
 
-
+        //Debug.Log("Ping Debug - PhotonHandler.PingImplementation: " + PhotonHandler.PingImplementation + " ping.GetType():" + ping.GetType() + " regionAddress:" + regionAddress);
         for (int i = 0; i < Attempts; i++)
         {
             bool overtime = false;
@@ -281,7 +289,7 @@ public class PhotonPingManager
 
     public static string ResolveHost(string hostName)
     {
-        #if UNITY_WEBGL
+#if UNITY_WEBGL
         if (hostName.StartsWith("wss://"))
         {
             hostName = hostName.Substring(6);
@@ -290,7 +298,7 @@ public class PhotonPingManager
         {
             hostName = hostName.Substring(5);
         }
-        #endif
+#endif
 
         return hostName;
     }
@@ -303,7 +311,7 @@ public class PhotonPingManager
     /// <remarks>
     /// To be compatible with most platforms, the address family is checked like this:</br>
     /// if (ipAddress.AddressFamily.ToString().Contains("6")) // ipv6...
-    /// </reamrks>
+    /// </remarks>
     /// <param name="hostName">Hostname to resolve.</param>
     /// <returns>IP string or empty string if resolution fails</returns>
     public static string ResolveHost(string hostName)

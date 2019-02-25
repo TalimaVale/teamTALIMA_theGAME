@@ -7,7 +7,7 @@ teamTALIMA: theGAME is an ongoing, open source, game development project created
 
 theGAME is being developed by teamTALIMA community members as a learning project. Primary development tools include Unity3D, C#, and Photon (handles network code). Project contributions can be made by anyone interested in improving their game development skills and/or helping us to improve the project!
 
-theGAME is an ongoing community project, and it will never be ‘finished’. Having a few mismatched art assets and random features from teammates still learning/experimenting with game development, just makes our game that much more awesome ;)
+theGAME is an ongoing community project, and it will never be ‘finished’. Having a few mismatched art assets and random features from teammates still learning/experimenting with game development, makes our game that much more awesome!
 
 ## Playing theGAME
 Anyone can play theGAME! Check out the repo ['releases'](https://github.com/teamTALIMA/teamTALIMA_theGAME/releases) page to download the latest build for your system. Launch the application, assign yourself a username, and join the online server.
